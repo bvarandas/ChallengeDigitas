@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "OrderBook.Application": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
