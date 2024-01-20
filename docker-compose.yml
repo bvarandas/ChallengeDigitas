@@ -25,3 +25,9 @@ services:
       context: .
       dockerfile: OrderBook.Application/Dockerfile
 
+  orderbook.api:
+    image: ${DOCKER_REGISTRY-}orderbookapi
+    build:
+      context: .
+      dockerfile: OrderBook.Api/Dockerfile
+
