@@ -11,8 +11,24 @@ IWebHostEnvironment environment = builder.Environment;
 
 configuration.AddJsonFile($"ocelot.{environment.EnvironmentName}.json", true, true);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy",
+                policy => {
+                    policy
+                    .WithOrigins("http://localhost:4200")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+
+                });
+});
+builder.Services.AddOcelot()
+    .AddKubernetes()
+    .AddCacheManager(o => o.WithDictionaryHandle());
+builder.Services.AddSignalR();
+
 
 var app = builder.Build();
 
@@ -21,12 +37,15 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
 }
-app.UseStaticFiles();
 
+app.AddCorrelationIdMiddleware();
 app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapRazorPages();
+app.UseCors("CorsPolicy");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello Ocelot"); });
+});
+app.UseWebSockets();
+await app.UseOcelot();
 
 app.Run();

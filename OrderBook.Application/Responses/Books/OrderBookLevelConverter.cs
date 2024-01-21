@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OrderBook.Core.Entities;
 
 namespace OrderBook.Application.Responses.Books;
 
