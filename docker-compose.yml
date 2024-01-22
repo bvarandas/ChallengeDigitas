@@ -19,15 +19,18 @@ services:
       context: .
       dockerfile: Ocelot.ApiGateway/Dockerfile
 
-  orderbook.application:
-    image: ${DOCKER_REGISTRY-}orderbookapplication
-    build:
-      context: .
-      dockerfile: OrderBook.Application/Dockerfile
+  
 
   orderbook.api:
     image: ${DOCKER_REGISTRY-}orderbookapi
     build:
       context: .
       dockerfile: OrderBook.Api/Dockerfile
+
+
+  orderbook.worker:
+    image: ${DOCKER_REGISTRY-}orderbookworker
+    build:
+      context: .
+      dockerfile: OrderBook.Worker/Dockerfile
 

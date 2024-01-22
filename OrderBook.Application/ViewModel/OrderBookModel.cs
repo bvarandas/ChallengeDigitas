@@ -1,15 +1,15 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using OrderBook.Core.Enumerations;
-
-namespace OrderBook.Core.Entities;
-
-public class OrderBook : BaseEntity
+﻿using OrderBook.Core.Enumerations;
+namespace OrderBook.Application.ViewModel;
+public class OrderBookModel  
 {
     public string Ticker { get; set; } = string.Empty;
+
     public DateTime Timestamp { get; set; }
+
     public DateTime Microtimestamp { get; set; }
+
     public BookLevel[] Bids { get; set; } = null!;
+
     public BookLevel[] Asks { get; set; } = null!;
 }
 
@@ -22,11 +22,4 @@ public class BookLevel
     public double Amount { get; set; }
 
     public long OrderId { get; set; }
-}
-
-public class BaseEntity
-{
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; } = string.Empty;
 }
