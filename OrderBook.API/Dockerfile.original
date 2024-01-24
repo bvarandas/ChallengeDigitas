@@ -2,15 +2,11 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
-EXPOSE 5200
+EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["OrderBook.API/OrderBook.API.csproj", "OrderBook.API/"]
-COPY ["Common.Logging/Common.Logging.csproj", "Common.Logging/"]
-COPY ["OrderBook.Application/OrderBook.Application.csproj", "OrderBook.Application/"]
-COPY ["OrderBook.Core/OrderBook.Core.csproj", "OrderBook.Core/"]
-COPY ["OrderBook.Infrastructure/OrderBook.Infrastructure.csproj", "OrderBook.Infrastructure/"]
 RUN dotnet restore "OrderBook.API/OrderBook.API.csproj"
 COPY . .
 WORKDIR "/src/OrderBook.API"

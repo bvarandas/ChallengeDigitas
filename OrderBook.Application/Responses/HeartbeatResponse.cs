@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Reactive.Subjects;
-using OrderBook.API.Json;
+using OrderBook.Application.Responses;
+using OrderBook.Application.Responses.Json;
 namespace OrderBook.API.Bitstamp.Responses;
-
 public class HeartbeatResponse: ResponseBase
 {
     internal static bool TryHandle(JObject response, ISubject<HeartbeatResponse> subject)

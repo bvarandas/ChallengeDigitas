@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using OrderBook.Core.Entities;
 using OrderBook.Core.Enumerations;
 
-namespace OrderBook.API.Bitstamp.Responses.Books;
+namespace OrderBook.Application.Responses.Books;
 
 internal class OrderBookLevelConverter : JsonConverter
 {

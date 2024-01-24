@@ -1,8 +1,11 @@
-﻿using OrderBook.API.Json;
+﻿using OrderBook.Application.Responses;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Reactive.Subjects;
 using OrderBook.API.Bitstamp.Responses;
+using OrderBook.Application.Responses.Json;
+using OrderBook.Application.Responses;
+using OrderBook.Core.Enumerations;
 
 namespace OrderBook.API.Responses;
 

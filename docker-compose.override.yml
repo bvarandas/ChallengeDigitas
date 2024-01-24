@@ -1,6 +1,17 @@
 version: '3.4'
 
 services:
+  orderbook.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
+    depends_on:
+      - rabbitmq
+      - elasticsearch
+    ports:
+      - "5200:80"
+    networks:
+      - challenge
   ocelot.apigateway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -28,6 +39,9 @@ services:
     restart: always
     ports:
       - "27017:27017"
+    environment:
+       MONGO_INITDB_ROOT_USERNAME: root
+       MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
       - mongo_data:/data/db
     networks:
@@ -39,6 +53,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - challenge
   
   kibana:
     container_name: kibana
@@ -48,6 +64,19 @@ services:
       - elasticsearch
     ports:
       - "5601:5601"
+  
+  orderbook.worker:
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
+    depends_on:
+      - rabbitmq
+      - elasticsearch
+    ports:
+      - "5303:5303"
+    networks:
+      - challenge
+
 
 volumes:
   mongo_data:

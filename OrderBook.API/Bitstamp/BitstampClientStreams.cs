@@ -1,8 +1,9 @@
 ﻿using OrderBook.API.Bitstamp.Responses;
 using OrderBook.API.Responses;
+using OrderBook.Application.Responses;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-namespace OrderBook.API.Client;
+namespace OrderBook.API.Bitstamp.Client;
 public class BitstampClientStreams
 {
     internal readonly Subject<ErrorResponse> ErrorSubject = new Subject<ErrorResponse>();

@@ -1,13 +1,13 @@
 ﻿using OrderBook.API.Communicator;
-using OrderBook.API.Json;
 using OrderBook.API.Logging;
 using OrderBook.API.Responses;
 using Newtonsoft.Json.Linq;
 using Websocket.Client;
-using OrderBook.API.Requests;
 using OrderBook.API.Bitstamp.Responses;
+using OrderBook.Application.Responses.Json;
+using OrderBook.Application.Requests;
 
-namespace OrderBook.API.Client;
+namespace OrderBook.API.Bitstamp.Client;
 
 public class WebsocketClient : IDisposable
 {

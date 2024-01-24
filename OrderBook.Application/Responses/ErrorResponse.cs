@@ -1,9 +1,9 @@
 ﻿using System.Reactive.Subjects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OrderBook.API.Json;
+using OrderBook.Application.Responses.Json;
 using OrderBook.Core.Enumerations;
-namespace OrderBook.API.Bitstamp.Responses;
+namespace OrderBook.Application.Responses;
 public class ErrorResponse : ResponseBase
 {
     public override MessageType Event => MessageType.Error;

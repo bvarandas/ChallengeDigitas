@@ -1,4 +1,4 @@
-﻿namespace OrderBook.API.Bitstamp.Responses;
+﻿namespace OrderBook.Application.Responses;
 public abstract class ResponseBase : MessageBase
 {
     public string Channel { get; set; } = string.Empty;

@@ -1,9 +1,5 @@
-﻿
-
-using Newtonsoft.Json;
-
-namespace OrderBook.API.Requests;
-
+﻿using Newtonsoft.Json;
+namespace OrderBook.Application.Requests;
 public abstract class RequestBase
 {
     [JsonProperty("event")]

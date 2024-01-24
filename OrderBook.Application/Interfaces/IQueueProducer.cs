@@ -1,6 +1,5 @@
 ﻿namespace OrderBook.Application.Interfaces;
-
 public interface IQueueProducer
 {
-    Task PublishMessage(Core.Entities.OrderBook message);
+    Task PublishMessage( Responses.Books.OrderBook message);
 }

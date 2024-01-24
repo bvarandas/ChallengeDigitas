@@ -71,3 +71,10 @@ public enum OrderBookSide
     Bid,
     Ask
 }
+
+public enum TradeSide
+{
+    Undefined,
+    Buy,
+    Sell
+}

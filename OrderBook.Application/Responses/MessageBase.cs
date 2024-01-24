@@ -1,7 +1,7 @@
 ﻿using OrderBook.Core.Enumerations;
 using System.Net.WebSockets;
 
-namespace OrderBook.API.Bitstamp;
+namespace OrderBook.Application.Responses;
 
 public class MessageBase
 {

@@ -44,11 +44,11 @@ public class QueueProducer : BackgroundService, IQueueProducer
         }
     }
 
-    public Task PublishMessage(Core.Entities.OrderBook message)
+    public Task PublishMessage( Application.Responses.Books.OrderBook message)
     {
         try
         {
-            _logger.LogInformation($"QueueProducer - Enviando mensagem nova {message.Id}");
+            _logger.LogInformation($"QueueProducer - Enviando mensagem nova {message.Ticker}");
 
             var body = message.SerializeToByteArrayProtobuf();
 

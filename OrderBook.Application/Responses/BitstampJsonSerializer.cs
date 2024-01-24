@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 
-namespace OrderBook.API.Json;
+namespace OrderBook.Application.Responses.Json;
 
 /// <summary>
 /// Helper class for JSON serialization

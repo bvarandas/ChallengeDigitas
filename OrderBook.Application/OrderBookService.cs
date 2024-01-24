@@ -24,12 +24,12 @@ public class OrderBookService : IOrderBookService
         _orderBookRepository = orderBookRepository;
         _logger = logger;
     }
-    public Task<OrderBookModel> GetCashOrderBookIDAsync(string orderBookId)
+    public Task<OrderBookViewModel> GetCashOrderBookIDAsync(string orderBookId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IAsyncEnumerable<OrderBookModel>> GetListAllAsync()
+    public Task<IAsyncEnumerable<OrderBookViewModel>> GetListAllAsync()
     {
         throw new NotImplementedException();
     }

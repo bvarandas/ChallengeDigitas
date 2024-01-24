@@ -1,16 +1,15 @@
-﻿using OrderBook.API.Json;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OrderBook.Core.Entities;
 using OrderBook.Core.Enumerations;
 
-namespace OrderBook.API.Bitstamp.Responses.Books;
+namespace OrderBook.Application.Responses.Books;
 
 public class OrderBook
 {
     /// <summary>
-    /// Ticket - crypto with currency
+    /// Ticker - crypto with currency
     /// </summary>
-    public string Ticket { get; set; }=string.Empty;
+    public string Ticker { get; set; }=string.Empty;
 
     /// <summary>
     /// Timestamp - datetime only seconds

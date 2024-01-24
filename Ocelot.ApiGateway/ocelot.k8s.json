@@ -1,0 +1,32 @@
+{
+  "Routes": [
+    //SignalR
+    {
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
+      "UpstreamPathTemplate": "/hubs/{everything}",
+      "DownstreamPathTemplate": "/hubs/{everything}",
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5200
+        }
+      ]
+    },
+    //OrderBook API
+    {
+      "DownstreamPathTemplate": "/api/orderbook",
+      "DownstreamScheme": "http",
+      "ServiceName": "orderbook",
+      "UpstreamPathTemplate": "/api/orderbook",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "FileCacheOptions": { "TtlSeconds": 30 }
+    }
+  ],
+  "GlobalConfiguration": {
+    "ServiceDiscoveryProvider": {
+      "Namespace": "default",
+      "Type": "KubernetesServiceDiscoveryProvider"
+    }
+  }
+}

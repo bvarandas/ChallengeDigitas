@@ -1,8 +1,9 @@
-﻿using OrderBook.API.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System.Reactive.Subjects;
 using OrderBook.API.Bitstamp.Responses;
 using OrderBook.Core.Enumerations;
+using OrderBook.Application.Responses;
+using OrderBook.Application.Responses.Json;
 
 namespace OrderBook.API.Responses;
 
@@ -10,7 +11,7 @@ public class UnsubscriptionSucceeded : ResponseBase
 {
     public override MessageType Event => MessageType.Unsubscribe;
 
-    internal static bool TryHandle(JObject response, ISubject<UnsubscriptionSucceeded> subject)
+    public static bool TryHandle(JObject response, ISubject<UnsubscriptionSucceeded> subject)
     {
         var eventName = response?["event"];
         if (eventName == null || eventName.Value<string>() != "bts:unsubscription_succeeded")

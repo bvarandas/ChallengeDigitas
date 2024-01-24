@@ -1,6 +1,11 @@
 version: '3.4'
 
 services:
+  orderbook.api:
+    image: ${DOCKER_REGISTRY-}orderbookapi
+    build:
+      context: .
+      dockerfile: OrderBook.Api/Dockerfile
   mongodb:
     image: mongo
   
@@ -20,14 +25,6 @@ services:
       dockerfile: Ocelot.ApiGateway/Dockerfile
 
   
-
-  orderbook.api:
-    image: ${DOCKER_REGISTRY-}orderbookapi
-    build:
-      context: .
-      dockerfile: OrderBook.Api/Dockerfile
-
-
   orderbook.worker:
     image: ${DOCKER_REGISTRY-}orderbookworker
     build:

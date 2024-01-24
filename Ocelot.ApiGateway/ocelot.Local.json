@@ -1,0 +1,50 @@
+{
+  "Routes": [
+    //SignalR config
+    {
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "UpstreamPathTemplate": "/hubs/",
+      "DownstreamPathTemplate": "/hubs/",
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5200
+        }
+      ]
+    },
+    {
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "UpstreamPathTemplate": "/hubs/{path}",
+      "DownstreamPathTemplate": "/hubs/{path}",
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5200
+        }
+      ]
+    },
+    //OrderBook API
+    {
+      "DownstreamPathTemplate": "api/orderbook/",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": "5200"
+        }
+      ],
+      "UpstreamPathTemplate": "api/orderbook/",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ],
+      "FileCacheOptions": { "TtlSeconds": 30 }
+    }
+  ],
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}

@@ -11,6 +11,17 @@ public class OrderBook : BaseEntity
     public DateTime Microtimestamp { get; set; }
     public BookLevel[] Bids { get; set; } = null!;
     public BookLevel[] Asks { get; set; } = null!;
+
+    public OrderBook(string ticker, DateTime timestamp, DateTime microtimestamp, BookLevel[] bids, BookLevel[] asks)
+    {
+        Ticker = ticker;
+        Timestamp = timestamp;
+        Microtimestamp = microtimestamp;
+        Bids = bids;
+        Asks = asks;
+    }
+
+    public OrderBook() { }
 }
 
 public class BookLevel

@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common.Logging\Common.Logging.csproj" />
     <ProjectReference Include="..\OrderBook.Application\OrderBook.Application.csproj" />
   </ItemGroup>
 

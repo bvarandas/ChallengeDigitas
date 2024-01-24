@@ -1,7 +1,7 @@
-﻿using OrderBook.API.Utils;
+﻿using OrderBook.Application.Requests;
 using OrderBook.Core.Enumerations;
 
-namespace OrderBook.API.Requests;
+namespace OrderBook.Application.Responses.Responses.Requests;
 
 public class SubscribeRequest : RequestBase
 {
