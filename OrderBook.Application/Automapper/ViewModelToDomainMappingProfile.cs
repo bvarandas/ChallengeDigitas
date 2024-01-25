@@ -8,12 +8,17 @@ public class ViewModelToDomainMappingProfile : Profile
     public ViewModelToDomainMappingProfile()
     {
         CreateMap<OrderBookViewModel, InsertOrderBookCommand>();
-                //.ConstructUsing(c => new InsertOrderBookCommand(c.Description, c.Amount, c.Entry, c.Date));
         CreateMap<OrderBookViewModel, UpdateOrderBookCommand>();
-        //.ConstructUsing(c => new UpdateOrderBookCommand(c.CashFlowId, c.Description, c.Amount, c.Entry, c.Date));
         CreateMap<OrderBook.Core.Entities.OrderBook, InsertOrderBookCommand>();
-        //.ConstructUsing(c => new InsertOrderBookCommand(c.Description, c.Amount, c.Entry, c.Date));
         CreateMap<OrderBook.Core.Entities.OrderBook, UpdateOrderBookCommand>();
-            //.ConstructUsing(c => new UpdateOrderBookCommand(c.CashFlowId, c.Description, c.Amount, c.Entry, c.Date));
+
+        CreateMap<OrderBook.Application.Responses.Books.BookLevel, BookLevelCommand>();
+        CreateMap<OrderBook.Application.Responses.Books.OrderBook, UpdateOrderBookCommand>();
+        CreateMap<OrderBook.Application.Responses.Books.OrderBook, InsertOrderBookCommand>();
+        
+        CreateMap<BookLevelCommand, OrderBook.Core.Entities.BookLevel>();
+        CreateMap<UpdateOrderBookCommand, OrderBook.Core.Entities.OrderBook>();
+        CreateMap<InsertOrderBookCommand, OrderBook.Core.Entities.OrderBook>();
+
     }
 }

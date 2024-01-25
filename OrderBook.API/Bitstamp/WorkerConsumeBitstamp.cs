@@ -17,11 +17,16 @@ public class WorkerConsumeBitstamp : BackgroundService
     private readonly ILogger<WorkerConsumeBitstamp> _logger;
     private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
     private readonly IQueueProducer _queueProducer;
-    public WorkerConsumeBitstamp(IOptions<QueueCommandSettings> queueSettings, ILogger<WorkerConsumeBitstamp> logger, IQueueProducer queueProducer)
+    private readonly IOrderBookService _orderBookService;
+    public WorkerConsumeBitstamp(IOptions<QueueCommandSettings> queueSettings, 
+        ILogger<WorkerConsumeBitstamp> logger, 
+        IQueueProducer queueProducer, 
+        IOrderBookService orderBookService)
     {
         _logger = logger;
         _queueProducer = queueProducer;
         _queueSettings = queueSettings.Value;
+        _orderBookService = orderBookService;
     }
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -99,7 +104,7 @@ public class WorkerConsumeBitstamp : BackgroundService
                             $"({x.Data?.Bids?.Length})");
             
             x.Data.Ticker = x.Symbol;
-            
+            //_orderBookService.
             _queueProducer.PublishMessage(x.Data);
 
         });

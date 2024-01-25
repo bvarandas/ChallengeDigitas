@@ -6,6 +6,7 @@ using Websocket.Client;
 using OrderBook.API.Bitstamp.Responses;
 using OrderBook.Application.Responses.Json;
 using OrderBook.Application.Requests;
+using System;
 
 namespace OrderBook.API.Bitstamp.Client;
 
@@ -19,8 +20,10 @@ public class WebsocketClient : IDisposable
     public WebsocketClient(ICommunicator communicator)
     {
         _communicator = communicator;
-        _messageReceivedSubscription = _communicator.MessageReceived.Subscribe();
+        _messageReceivedSubscription = _communicator.MessageReceived.Subscribe(HandleMessage);
     }
+
+    
     private bool HandleRawMessage(string msg)
     {
         // ********************

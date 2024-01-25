@@ -49,12 +49,12 @@ IHost host = Host.CreateDefaultBuilder(args)
             //services.Configure<CashFlowSettings>(config.GetSection("CashFlowStoreDatabase"));
             services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
 
-            services.AddTransient<IMongoDbConnection>((provider) =>
-            {
-                var urlMongo = new MongoDB.Driver.MongoUrl("mongodb://root:example@mongo:27017/challengeCrf?authSource=admin");
+            //services.AddTransient<IMongoDbConnection>((provider) =>
+            //{
+            //    var urlMongo = new MongoDB.Driver.MongoUrl("mongodb://root:example@mongo:27017/challengeCrf?authSource=admin");
 
-                return MongoDbConnection.FromUrl(urlMongo);
-            });
+            //    return MongoDbConnection.FromUrl(urlMongo);
+            //});
 
             services.AddAutoMapperSetup();
 

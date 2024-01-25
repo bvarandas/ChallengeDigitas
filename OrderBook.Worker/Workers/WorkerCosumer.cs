@@ -71,50 +71,12 @@ public class WorkerConsumer : BackgroundService, IWorkerConsumer
         try
         {
             _logger.LogInformation("Chegou nova mensagem no Worker Consumer");
-            var message = e.Body.ToArray().DeserializeFromByteArrayProtobuf<Core.Entities.OrderBook>();
+            var message = e.Body.ToArray().DeserializeFromByteArrayProtobuf< Application.Responses.Books.OrderBook>();
             _logger.LogInformation("Conseguiu Deserializar a mensagem");
             _logger.LogInformation($"{message.Ticker}");
 
-            //var commandInsert = _mapper.Map<CashFlow, InsertCashFlowCommand>(message);
-            //_mediator.Send()
-
-            //switch (message.Action)
-            //{
-            //    case "insert":
-            //        var commandInsert = _mapper.Map<CashFlow, InsertCashFlowCommand>(message);
-            //        await _flowService.AddCashFlowAsync(commandInsert);
-            //        break;
-
-            //    case "update":
-            //        var commandUpdate = _mapper.Map<CashFlow, UpdateCashFlowCommand>(message);
-            //        await _flowService.UpdateCashFlowAsync(commandUpdate);
-            //        break;
-
-            //    case "remove":
-            //        _flowService.RemoveCashFlowAsync(message.CashFlowId);
-            //        break;
-
-            //    case "getall":
-                    
-            //        var registerlist = await _flowService.GetListAllAsync();
-                    
-            //        if (registerlist is not null)
-            //        {
-            //            await WorkerProducer._Singleton.PublishMessages(registerlist.ToListAsync().Result);
-            //        }
-            //        break;
-
-            //    case "get":
-            //        var register = await _flowService.GetCashFlowyIDAsync(message.CashFlowId);
-            //        var list = new List<CashFlowViewModel>();
-            //        if (register is not null)
-            //        {
-            //            list.Add(register);
-            //            await WorkerProducer._Singleton.PublishMessages(list);
-            //        }
-            //        break;
-
-            //}
+            var commandInsert = _mapper.Map<Application.Responses.Books.OrderBook, InsertOrderBookCommand>(message);
+            _mediator.Send(commandInsert);
 
             _channel.BasicAck(e.DeliveryTag, true);
 

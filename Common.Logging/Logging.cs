@@ -24,8 +24,7 @@ public static class Logging
 
             if (context.HostingEnvironment.IsDevelopment())
             {
-                loggerConfiguration.MinimumLevel.Override("CashFlow", LogEventLevel.Debug);
-                loggerConfiguration.MinimumLevel.Override("DailyConsolidated", LogEventLevel.Debug);
+                loggerConfiguration.MinimumLevel.Override("OrderBook", LogEventLevel.Error);
             }
 
             var elasticUrl = context.Configuration.GetValue<string>("ElasticConfiguration:Uri");
@@ -36,8 +35,8 @@ public static class Logging
                 {
                     AutoRegisterTemplate = true,
                     AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv8,
-                    IndexFormat = "CashFlow-Logs-{0:yyyy.MM.dd}",
-                    MinimumLogEventLevel = LogEventLevel.Debug,
+                    IndexFormat = "OrderBook-Logs-{0:yyyy.MM.dd}",
+                    MinimumLogEventLevel = LogEventLevel.Error,
                 });
             }
         };

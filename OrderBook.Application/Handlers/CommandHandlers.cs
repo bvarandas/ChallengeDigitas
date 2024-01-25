@@ -42,16 +42,16 @@ public class InsertOrderBookCommandHandler : IRequestHandler<InsertOrderBookComm
     private readonly IMapper _mapper;
     private readonly IOrderBookRepository _orderBookRepository;
 
-    public InsertOrderBookCommandHandler(ILogger<UpdateOrderBookCommandHandler> logger, IOrderBookRepository orderBookRepository)
+    public InsertOrderBookCommandHandler(ILogger<UpdateOrderBookCommandHandler> logger, IOrderBookRepository orderBookRepository, IMapper mapper)
     {
+        _mapper = mapper;
         _logger = logger;
         _orderBookRepository = orderBookRepository;
     }
 
     public async Task<Result<bool>> Handle(InsertOrderBookCommand command, CancellationToken cancellationToken)
     {
-        var orderBookToInsert = new Core.Entities.OrderBook();
-        _mapper.Map(command, orderBookToInsert, typeof(InsertOrderBookCommand), typeof(Core.Entities.OrderBook));
+        var orderBookToInsert = _mapper.Map<InsertOrderBookCommand, OrderBook.Core.Entities.OrderBook>(command);
         await _orderBookRepository.CreateOrderBook(orderBookToInsert);
         _logger.LogInformation($"Order Book {orderBookToInsert.Ticker}");
         return await Task.FromResult(true);

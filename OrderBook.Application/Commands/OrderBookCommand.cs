@@ -40,11 +40,6 @@ public class UpdateOrderBookCommand : OrderBookCommand, IRequest<Result<bool>>
         Ticker = ticker;
         Timestamp = timestamp;
         Microtimestamp = microtimestamp;
-        for (int i=0; i<= bids.Length; i++)
-        {
-            Bids[i].Amount = bids[i].Amount;
-
-        }
         Bids = bids;
         Asks = asks;
     }

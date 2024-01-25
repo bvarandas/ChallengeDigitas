@@ -20,13 +20,20 @@ public class OrderBookRepository : IOrderBookRepository
         string ticker = orderBook.Ticker;
         var inserts = new List<WriteModel<Core.Entities.OrderBook>>();
         var filterBuilder = Builders<Core.Entities.OrderBook>.Filter;
-
+        bool result = false;
         var filter = filterBuilder.Where(x => x.Ticker == ticker);
-        inserts.Add(new InsertOneModel<Core.Entities.OrderBook>(orderBook));
+        try
+        {
+            inserts.Add(new InsertOneModel<Core.Entities.OrderBook>(orderBook));
 
-        var insertResult = await _context.OrderBooks.BulkWriteAsync(inserts);
+            var insertResult = await _context.OrderBooks.BulkWriteAsync(inserts);
+            result = insertResult.IsAcknowledged && insertResult.ModifiedCount > 0;
+        }
+        catch(Exception ex)
+        {
 
-        return insertResult.IsAcknowledged && insertResult.ModifiedCount > 0;
+        }
+        return result;
     }
 
     public async Task<IEnumerable<Core.Entities.OrderBook>> GetOrderBooks(OrderBookSpecParams specParams)

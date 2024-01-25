@@ -13,12 +13,14 @@ public class QueueProducer : BackgroundService, IQueueProducer
     private readonly IModel _channel = null!;
     private readonly IConnection _connection = null!;
     private readonly ILogger<QueueProducer> _logger;
-
-    public QueueProducer(IOptions<QueueCommandSettings> queueSettings, ILogger<QueueProducer> logger)
+    private readonly IOrderBookService _orderBookService;
+    public QueueProducer(IOptions<QueueCommandSettings> queueSettings, 
+        ILogger<QueueProducer> logger, IOrderBookService orderBookService)
     {
 
         _logger = logger;
         _queueSettings = queueSettings.Value;
+        _orderBookService = orderBookService;
         try
         {
             _factory = new ConnectionFactory { HostName = _queueSettings.HostName, Port = 5672 };

@@ -12,6 +12,7 @@ services:
       - "5200:80"
     networks:
       - challenge
+
   ocelot.apigateway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -23,19 +24,30 @@ services:
   elasticsearch:
     container_name: elasticsearch
     environment:
-      - xpack.monitoring.enabled=true
-      - xpack.watcher.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # - cluster.initial_master_nodes=elasticsearch
+      # - xpack.monitoring.enabled=true
+      # - xpack.watcher.enabled=false
+      # - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
       - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add: 
+      - IPC_LOCK
     ports:
       - "9200:9200"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
-    networks:
-      - challenge
+    # networks:
+    #   - challenge
   
   mongodb:
-    container_name: mongodb
+    container_name: mongo
     restart: always
     ports:
       - "27017:27017"
@@ -60,6 +72,8 @@ services:
     container_name: kibana
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    restart: always
     depends_on:
       - elasticsearch
     ports:
@@ -67,7 +81,7 @@ services:
   
   orderbook.worker:
     environment:
-      - DOTNET_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Development
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
     depends_on:
       - rabbitmq
@@ -80,7 +94,8 @@ services:
 
 volumes:
   mongo_data:
-  elasticsearch-data:  
+  elasticsearch-data:
+    driver: local
 
 networks:
     challenge:
