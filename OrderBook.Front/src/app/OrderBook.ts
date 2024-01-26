@@ -18,9 +18,9 @@ export class BookLevel{
 export class OrderBookData
 {
     ticker:string;
-    maxprice: number;
-    minprice: number;
-    averageprice: number;
-    averagepriceLast5seconds: number;
-    averageamountquantity: number;
+    maxPrice: number;
+    minPrice: number;
+    averagePrice: number;
+    averagePriceLast5Seconds: number;
+    averageAmountQuantity: number;
 }

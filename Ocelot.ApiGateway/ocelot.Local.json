@@ -38,6 +38,19 @@
       "UpstreamPathTemplate": "api/orderbook/",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT" ],
       "FileCacheOptions": { "TtlSeconds": 30 }
+    },
+    {
+      "DownstreamPathTemplate": "api/orderbook/trade",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": "5200"
+        }
+      ],
+      "UpstreamPathTemplate": "api/orderbook/trade",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ],
+      "FileCacheOptions": { "TtlSeconds": 30 }
     }
   ],
   "Logging": {

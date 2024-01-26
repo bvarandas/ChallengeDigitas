@@ -9,11 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using OrderBook.Core.Specs;
 using MongoFramework;
 using System.Reflection;
-using OrderBook.Queue.Worker.Configurations;
 using FluentResults;
 using MediatR;
-using OrderBook.Application;
-using OrderBook.Application.Interfaces;
 using OrderBook.Infrastructure.Data;
 using OrderBook.Core.Repositories;
 using OrderBook.Infrastructure.Repositories;
@@ -64,12 +61,8 @@ IHost host = Host.CreateDefaultBuilder(args)
                 cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
             });
 
-            // Application
-            //services.AddSingleton<IOrderBookService, OrderBookService>();
-            
             // Domain - Commands
             services.AddSingleton<IRequestHandler<InsertOrderBookCommand, Result<bool>>, InsertOrderBookCommandHandler>();
-            services.AddSingleton<IRequestHandler<UpdateOrderBookCommand, Result<bool>>, UpdateOrderBookCommandHandler>();
             
             // Infra - Data
             services.AddSingleton<IOrderBookRepository, OrderBookRepository>();

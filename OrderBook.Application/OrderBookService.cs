@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using OrderBook.Application.Commands;
 using OrderBook.Application.Handlers;
@@ -6,29 +7,28 @@ using OrderBook.Application.Interfaces;
 using OrderBook.Application.Responses.Books;
 using OrderBook.Application.ViewModel;
 using OrderBook.Core.Repositories;
+using OrderBook.Infrastructure.Repositories;
 using System.Collections.Concurrent;
 namespace OrderBook.Application;
 public class OrderBookService : IOrderBookService
 {
     private readonly ILogger<OrderBookService> _logger;
     private readonly IMapper _mapper;
-    private readonly IOrderBookRepository _orderBookRepository;
-    private readonly IOrderTradeRepository _orderTradeRepository;
     private ConcurrentDictionary<string, Application.Responses.Books.OrderBook> _dicOrderBook;
     private ConcurrentQueue<Application.Responses.Books.OrderBook> _queueOrderBook;
     private static ConcurrentDictionary<string, OrderBookDataViewModel> _dicOrderBookData;
     private readonly Thread _threadOrderBook, _treadDequequeOrderBook;
     private readonly SemaphoreSlim _semaphore;
+    private readonly IMediator _mediator;
     public OrderBookService(IMapper mapper, 
-        IOrderBookRepository orderBookRepository,
-        IOrderTradeRepository orderTradeRepository,
+        IMediator mediator,
         ILogger<OrderBookService> logger)
     {
         _mapper = mapper;
-        _orderBookRepository = orderBookRepository;
-        _orderTradeRepository = orderTradeRepository;
         _logger = logger;
         
+        _mediator = mediator;
+
         _dicOrderBook = new ConcurrentDictionary<string, Responses.Books.OrderBook>();
         _dicOrderBookData = new ConcurrentDictionary<string, OrderBookDataViewModel>();
         _semaphore = new SemaphoreSlim(1, 2);
@@ -40,6 +40,8 @@ public class OrderBookService : IOrderBookService
         _treadDequequeOrderBook = new Thread(new ThreadStart(DequeueOrderBookCacheAsync));
         _treadDequequeOrderBook.Name = "DequeueOrderBookCacheAsync";
         _treadDequequeOrderBook.Start();
+
+        _queueOrderBook = new ConcurrentQueue<Responses.Books.OrderBook>();
     }
 
     private async Task<(IList<BookLevel>, double)> GetQuotesBidAsync(Core.ValuesObject.Ticker ticker,double quantityRequest)
@@ -49,7 +51,7 @@ public class OrderBookService : IOrderBookService
         if (_dicOrderBook.TryGetValue(ticker.ticker, out Responses.Books.OrderBook orderBook))
         {
             Array.ForEach(orderBook.Bids, bid => { 
-                if (quantityRequest < quantityCollected)
+                if (quantityRequest > quantityCollected)
                 {
                     quantityCollected += bid.Amount;
                     result.Item1.Add(bid);
@@ -68,13 +70,14 @@ public class OrderBookService : IOrderBookService
         if (_dicOrderBook.TryGetValue(ticker.ticker, out Responses.Books.OrderBook orderBook))
         {
             Array.ForEach(orderBook.Asks, ask => {
-                if (quantityRequest < AmountCollected)
+                if (quantityRequest > AmountCollected)
                 {
                     AmountCollected += ask.Amount;
                     result.Item1.Add(ask);
                 }
             });
         }
+        result.Item2 = AmountCollected;
         return result;
     }
 
@@ -82,8 +85,6 @@ public class OrderBookService : IOrderBookService
     {
         while (true)
         {
-            await _semaphore.WaitAsync();
-           
             while (_queueOrderBook.TryDequeue(out var orderBook))
             {
                 var now = DateTime.Now;
@@ -105,10 +106,10 @@ public class OrderBookService : IOrderBookService
                 book.Asks = listAsk.ToArray();
                 book.Bids = listBids.ToArray();
             }
-
-            _semaphore.Release();
+            //_semaphore.Wait();
+            //_semaphore.Release();
             
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
         }
     }
 
@@ -119,7 +120,7 @@ public class OrderBookService : IOrderBookService
         {
             DateTime now = DateTime.Now;
             
-            await _semaphore.WaitAsync();
+            _semaphore.Wait();
             
             if ((now.TimeOfDay - lastCycle).TotalSeconds >= 5)
             {
@@ -134,13 +135,12 @@ public class OrderBookService : IOrderBookService
         }
     }
 
-    
-
     private async Task UpdateOrderBookDataCacheAsync()
     {
         foreach (KeyValuePair<string, OrderBookDataViewModel> kvp in _dicOrderBookData)
         {
             var orderBook       = _dicOrderBook[kvp.Key];
+            if (orderBook.Bids.Length == 0 || orderBook.Asks.Length == 0) continue;
             kvp.Value.Ticker    = orderBook.Ticker;
             kvp.Value.MinPrice  = orderBook.Bids.FirstOrDefault().Price;
             kvp.Value.MaxPrice  = orderBook.Asks.FirstOrDefault().Price;
@@ -169,7 +169,7 @@ public class OrderBookService : IOrderBookService
         {
             var asksToRemove = Array.FindAll( kvp.Value.Asks, x => x.Timestamp < now.AddSeconds(-5));
             var bidsToRemove = Array.FindAll(kvp.Value.Bids, x => x.Timestamp < now.AddSeconds(-5));
-                
+
             kvp.Value.Asks = kvp.Value.Asks.Except(asksToRemove).ToArray();
             kvp.Value.Bids = kvp.Value.Bids.Except(bidsToRemove).ToArray();
         }
@@ -205,20 +205,24 @@ public class OrderBookService : IOrderBookService
         try
         {
             var quotations = command.TradeSide == Core.Enumerations.TradeSide.Buy ?
-                GetQuotesAskAsync(command.Ticker,command.QuantityRequested) : 
+                GetQuotesAskAsync(command.Ticker, command.QuantityRequested) :
                 GetQuotesBidAsync(command.Ticker, command.QuantityRequested);
 
+            
             var entity = _mapper.Map<OrderTradeCommand, Core.Entities.OrderTrade>(command);
-            var listBookLevel = _mapper.Map<IList<OrderBook.Application.Responses.Books.BookLevel>, IList<OrderBook.Core.Entities.BookLevel>>(quotations.Result.Item1);
-            entity.Quotes = listBookLevel;
-            entity.AmountShaved = quotations.Result.Item2;
-            var result = await _orderTradeRepository.CreateOrderTradeAsync(entity);
-            resultObject = _mapper.Map<OrderBook.Core.Entities.OrderTrade, OrderTradeViewModel>(entity);
+            var listBookLevel = _mapper.Map<IList<OrderBook.Application.Responses.Books.BookLevel>, IList<BookLevelCommand>>(quotations.Result.Item1);
+            var quotes = listBookLevel;
+            var amountShaved = quotations.Result.Item2;
+            var insertCommand = new InsertOrderTradeCommand(command.Ticker, command.QuantityRequested, command.TradeSide, listBookLevel, amountShaved);
+            var result = _mediator.Send(insertCommand);
+            
+            resultObject = _mapper.Map<OrderTradeCommand, OrderTradeViewModel>(insertCommand);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message, ex);
         }
+
         return resultObject;
     }
 }

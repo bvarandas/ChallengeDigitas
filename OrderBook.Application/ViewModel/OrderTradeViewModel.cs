@@ -7,11 +7,11 @@ public class OrderTradeViewModel
 {
     public string Id { get; set; }=string.Empty;
     public Ticker Ticker { get; set; } = null!;
-    public IList<BookLevel> Quotes { get; set; } = null!;
+    public IList<BookLevelViewModel> Quotes { get; set; } = null!;
     public double QuantityRequested { get; set; }
     public TradeSide TradeSide { get; set; }
     public double AmountShaved { get; set; }
-    public OrderTradeViewModel(string id, Ticker ticker, IList<BookLevel> quotes, double quantityRequested, TradeSide tradeSide, double amountShaved)
+    public OrderTradeViewModel(string id, Ticker ticker, IList<BookLevelViewModel> quotes, double quantityRequested, TradeSide tradeSide, double amountShaved)
     {
         Id = id;
         Ticker = ticker;
@@ -20,5 +20,7 @@ public class OrderTradeViewModel
         TradeSide = tradeSide;
         AmountShaved = amountShaved;
     }
+
+    public OrderTradeViewModel() { }
 
 }

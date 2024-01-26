@@ -1,4 +1,6 @@
-﻿using OrderBook.Core.Enumerations;
+﻿using FluentResults;
+using MediatR;
+using OrderBook.Core.Enumerations;
 using OrderBook.Core.ValuesObject;
 namespace OrderBook.Application.Commands;
 public class OrderTradeCommand
@@ -14,5 +16,20 @@ public class OrderTradeCommand
         Ticker = ticker;
         QuantityRequested = quantityRequested;
         TradeSide = tradeSide;
+    }
+}
+
+public class InsertOrderTradeCommand : OrderTradeCommand, IRequest<Result<bool>>
+{
+    public IList<BookLevelCommand> Quotes { get; set; }
+    public double AmountShaved { get; set; }
+
+    public InsertOrderTradeCommand(Ticker ticker, double quantityRequested, TradeSide tradeSide, IList<BookLevelCommand> quotes, double amountShaved)
+    {
+        Ticker = ticker;
+        QuantityRequested = quantityRequested;
+        TradeSide = tradeSide;
+        Quotes = quotes;
+        AmountShaved = amountShaved;
     }
 }

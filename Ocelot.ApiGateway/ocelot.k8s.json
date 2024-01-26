@@ -21,6 +21,14 @@
       "UpstreamPathTemplate": "/api/orderbook",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "FileCacheOptions": { "TtlSeconds": 30 }
+    },
+    {
+      "DownstreamPathTemplate": "/api/orderbook/trade",
+      "DownstreamScheme": "http",
+      "ServiceName": "orderbook",
+      "UpstreamPathTemplate": "/api/orderbook/trade/",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "FileCacheOptions": { "TtlSeconds": 30 }
     }
   ],
   "GlobalConfiguration": {

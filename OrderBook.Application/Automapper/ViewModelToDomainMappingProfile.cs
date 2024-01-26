@@ -21,10 +21,10 @@ public class ViewModelToDomainMappingProfile : Profile
         CreateMap<BookLevelCommand, OrderBook.Core.Entities.BookLevel>();
         CreateMap<UpdateOrderBookCommand, OrderBook.Core.Entities.OrderBook>();
         CreateMap<InsertOrderBookCommand, OrderBook.Core.Entities.OrderBook>();
-
-        //CreateMap<IList<OrderBook.Application.Responses.Books.BookLevel>,IList< OrderBook.Core.Entities.BookLevel>>();
-
         CreateMap<OrderTradeCommand, OrderBook.Core.Entities.OrderTrade>()
             .ConstructUsing(c=> new OrderBook.Core.Entities.OrderTrade(c.Ticker, c.QuantityRequested, c.TradeSide,null!,0));
+
+        CreateMap<InsertOrderTradeCommand, OrderBook.Core.Entities.OrderTrade>();
+            //.ConstructUsing(c => new OrderBook.Core.Entities.OrderTrade(c.Ticker, c.QuantityRequested, c.TradeSide, c.Quotes, c.AmountShaved ));
     }
 }

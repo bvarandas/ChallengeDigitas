@@ -21,6 +21,7 @@ public class WorkerConsumeBitstamp : BackgroundService
     private readonly IQueueProducer _queueProducer;
     private readonly IOrderBookService _orderBookService;
     private readonly IServiceProvider _serviceProvider;
+    private static TimeSpan _lastCycle;
     public WorkerConsumeBitstamp(IOptions<QueueCommandSettings> queueSettings, 
         ILogger<WorkerConsumeBitstamp> logger, 
         IQueueProducer queueProducer, 
@@ -32,6 +33,7 @@ public class WorkerConsumeBitstamp : BackgroundService
         _queueSettings = queueSettings.Value;
         _orderBookService = orderBookService;
         _serviceProvider = provider;
+        _lastCycle = DateTime.Now.TimeOfDay;
     }
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -134,6 +136,23 @@ public class WorkerConsumeBitstamp : BackgroundService
                 await hubContext.Clients.Group("CrudMessage").SendAsync("ReceiveMessageEth", orderBook);
 
             await _orderBookService.AddOrderBookCacheAsync(orderBook);
+        }
+
+        var now = DateTime.Now;
+        if ((now.TimeOfDay - _lastCycle).TotalSeconds >= 2)
+        {
+            _lastCycle = now.TimeOfDay;
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<BrokerHub>>();
+
+                var orderbookData =_orderBookService.GetOrderBookDataCacheAsync(orderBook.Ticker);
+
+                if (orderBook.Ticker.StartsWith('b'))
+                    await hubContext.Clients.Group("CrudMessage").SendAsync("ReceiveMessageDataBtc", orderbookData.Result);
+                else
+                    await hubContext.Clients.Group("CrudMessage").SendAsync("ReceiveMessageDataEth", orderbookData.Result);
+            }
         }
     }
 

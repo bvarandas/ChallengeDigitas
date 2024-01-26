@@ -9,6 +9,10 @@ using OrderBook.Application.Automapper;
 using OrderBook.Core.Repositories;
 using OrderBook.Infrastructure.Repositories;
 using OrderBook.Infrastructure.Data;
+using FluentResults;
+using MediatR;
+using OrderBook.Application.Commands;
+using OrderBook.Application.Handlers;
 
 namespace OrderBook.API.Configurations;
 internal class NativeInjectorBoostrapper
@@ -23,6 +27,7 @@ internal class NativeInjectorBoostrapper
         services.AddSingleton<IQueueProducer, QueueProducer>();
         services.AddSingleton<ICorrelationIdGenerator, CorrelationIdGenerator>();
         services.AddSingleton<IOrderBookService, OrderBookService>();
+        //services.AddSingleton<IOrderTradeService, OrderBookService>();
         services.AddSingleton<IOrderBookRepository, OrderBookRepository>();
         services.AddSingleton<IOrderTradeRepository, OrderTradeRepository>();
         services.AddSingleton<IOrderBookContext, OrderBookContext>();
@@ -38,6 +43,9 @@ internal class NativeInjectorBoostrapper
         {
             cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
         });
+
+        // Domain - Commands
+        services.AddSingleton<IRequestHandler<InsertOrderTradeCommand, Result<bool>>, InsertOrderTradeCommandHandler>();
 
         services.AddAutoMapperSetup();
 
