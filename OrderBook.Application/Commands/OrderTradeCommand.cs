@@ -21,11 +21,13 @@ public class OrderTradeCommand
 
 public class InsertOrderTradeCommand : OrderTradeCommand, IRequest<Result<bool>>
 {
+    public string Id { get; set; }
     public IList<BookLevelCommand> Quotes { get; set; }
     public double AmountShaved { get; set; }
 
-    public InsertOrderTradeCommand(Ticker ticker, double quantityRequested, TradeSide tradeSide, IList<BookLevelCommand> quotes, double amountShaved)
+    public InsertOrderTradeCommand(string id,Ticker ticker, double quantityRequested, TradeSide tradeSide, IList<BookLevelCommand> quotes, double amountShaved)
     {
+        Id = id;
         Ticker = ticker;
         QuantityRequested = quantityRequested;
         TradeSide = tradeSide;

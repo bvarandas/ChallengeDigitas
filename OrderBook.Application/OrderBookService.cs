@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using OrderBook.Application.Commands;
 using OrderBook.Application.Handlers;
 using OrderBook.Application.Interfaces;
@@ -9,6 +10,8 @@ using OrderBook.Application.ViewModel;
 using OrderBook.Core.Repositories;
 using OrderBook.Infrastructure.Repositories;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
+
 namespace OrderBook.Application;
 public class OrderBookService : IOrderBookService
 {
@@ -51,7 +54,7 @@ public class OrderBookService : IOrderBookService
         if (_dicOrderBook.TryGetValue(ticker.ticker, out Responses.Books.OrderBook orderBook))
         {
             Array.ForEach(orderBook.Bids, bid => { 
-                if (quantityRequest > quantityCollected)
+                if (quantityRequest > quantityCollected && (quantityCollected + bid.Amount) < quantityRequest)
                 {
                     quantityCollected += bid.Amount;
                     result.Item1.Add(bid);
@@ -70,7 +73,7 @@ public class OrderBookService : IOrderBookService
         if (_dicOrderBook.TryGetValue(ticker.ticker, out Responses.Books.OrderBook orderBook))
         {
             Array.ForEach(orderBook.Asks, ask => {
-                if (quantityRequest > AmountCollected)
+                if (quantityRequest > AmountCollected && (AmountCollected + ask.Amount) < quantityRequest)
                 {
                     AmountCollected += ask.Amount;
                     result.Item1.Add(ask);
@@ -213,10 +216,10 @@ public class OrderBookService : IOrderBookService
             var listBookLevel = _mapper.Map<IList<OrderBook.Application.Responses.Books.BookLevel>, IList<BookLevelCommand>>(quotations.Result.Item1);
             var quotes = listBookLevel;
             var amountShaved = quotations.Result.Item2;
-            var insertCommand = new InsertOrderTradeCommand(command.Ticker, command.QuantityRequested, command.TradeSide, listBookLevel, amountShaved);
+            var insertCommand = new InsertOrderTradeCommand(ObjectId.GenerateNewId().ToString(), command.Ticker, command.QuantityRequested, command.TradeSide, listBookLevel, amountShaved);
             var result = _mediator.Send(insertCommand);
             
-            resultObject = _mapper.Map<OrderTradeCommand, OrderTradeViewModel>(insertCommand);
+            resultObject = _mapper.Map<InsertOrderTradeCommand, OrderTradeViewModel>(insertCommand);
         }
         catch (Exception ex)
         {

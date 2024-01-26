@@ -2,6 +2,7 @@
 using FluentResults;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using OrderBook.Application.Commands;
 using OrderBook.Core.Repositories;
 namespace OrderBook.Application.Handlers;
@@ -41,7 +42,7 @@ public class InsertOrderTradeCommandHandler : IRequestHandler<InsertOrderTradeCo
     public async Task<Result<bool>> Handle(InsertOrderTradeCommand command, CancellationToken cancellationToken)
     {
         var orderBookToInsert = _mapper.Map<InsertOrderTradeCommand, OrderBook.Core.Entities.OrderTrade>(command);
-
+        //orderBookToInsert.Id = ObjectId.GenerateNewId().ToString();
         await _orderTradeRepository.CreateOrderTradeAsync(orderBookToInsert);
 
         _logger.LogInformation($"Order Trade {orderBookToInsert.Ticker}");
