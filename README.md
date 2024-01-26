@@ -29,6 +29,7 @@ kubectl apply -f .
 ![image](https://github.com/bvarandas/ChallengeDigitas/assets/13907905/852bac3a-0493-45b5-87ff-6e1c03d6c84d)
 
 Tela Angular
+
 ![image](https://github.com/bvarandas/ChallengeDigitas/assets/13907905/97426a53-90f9-47c0-bfdd-0a3028c03033)
 
 
