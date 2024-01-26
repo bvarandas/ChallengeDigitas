@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using OrderBook.Application.Automapper;
-namespace OrderBook.Queue.Worker.Configurations;
+namespace OrderBook.Application.Automapper;
 public static class AutoMapperSetup
 {
     public static void AddAutoMapperSetup(this IServiceCollection services)

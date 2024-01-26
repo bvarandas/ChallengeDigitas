@@ -1,9 +1,15 @@
 ﻿using Common.Logging.Correlation;
 using OrderBook.API.Bitstamp;
 using OrderBook.API.Queue;
+using OrderBook.Application;
 using OrderBook.Application.Interfaces;
 using OrderBook.Core.Specs;
 using System.Reflection;
+using OrderBook.Application.Automapper;
+using OrderBook.Core.Repositories;
+using OrderBook.Infrastructure.Repositories;
+using OrderBook.Infrastructure.Data;
+
 namespace OrderBook.API.Configurations;
 internal class NativeInjectorBoostrapper
 {
@@ -13,10 +19,14 @@ internal class NativeInjectorBoostrapper
         services.AddSwaggerGen();
 
         services.Configure<QueueCommandSettings>(config.GetSection(nameof(QueueCommandSettings)));
-        //services.Configure<QueueEventSettings>(config.GetSection(nameof(QueueEventSettings)));
+        
         services.AddSingleton<IQueueProducer, QueueProducer>();
-        services.AddScoped<ICorrelationIdGenerator, CorrelationIdGenerator>();
-
+        services.AddSingleton<ICorrelationIdGenerator, CorrelationIdGenerator>();
+        services.AddSingleton<IOrderBookService, OrderBookService>();
+        services.AddSingleton<IOrderBookRepository, OrderBookRepository>();
+        services.AddSingleton<IOrderTradeRepository, OrderTradeRepository>();
+        services.AddSingleton<IOrderBookContext, OrderBookContext>();
+        services.AddSingleton<IOrderTradeContext, OrderTradeContext>();
         //SignalR
         services.AddSignalR();
 
@@ -28,6 +38,8 @@ internal class NativeInjectorBoostrapper
         {
             cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
         });
+
+        services.AddAutoMapperSetup();
 
         services.AddCors(options => options.AddPolicy("CorsPolicy", builderc =>
         {

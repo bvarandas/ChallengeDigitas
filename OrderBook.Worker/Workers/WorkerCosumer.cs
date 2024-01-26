@@ -1,9 +1,7 @@
 using MediatR;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using OrderBook.Core.Entities;
 using Microsoft.Extensions.Options;
-using System.Collections.Concurrent;
 using OrderBook.Application.Interfaces;
 using AutoMapper;
 using OrderBook.Application.Commands;
@@ -11,13 +9,9 @@ using OrderBook.Core.Extensions;
 using Microsoft.Extensions.Hosting;
 using OrderBook.Core.Specs;
 using Microsoft.Extensions.Logging;
-
 namespace OrderBook.Worker.Workers;
-
 public class WorkerConsumer : BackgroundService, IWorkerConsumer
 {
-    
-    private readonly  IOrderBookService _orderBookService;
     private readonly IMediator _mediator;
     private readonly ILogger<WorkerConsumer> _logger;
     private readonly QueueCommandSettings _queueSettings;
@@ -25,7 +19,7 @@ public class WorkerConsumer : BackgroundService, IWorkerConsumer
     private readonly IConnection _connection;
     private readonly IModel _channel;
     private readonly IMapper _mapper;
-    public WorkerConsumer(IOptions<QueueCommandSettings> queueSettings, ILogger<WorkerConsumer> logger, IOrderBookService orderBookService, IMapper mapper, IMediator mediator)
+    public WorkerConsumer(IOptions<QueueCommandSettings> queueSettings, ILogger<WorkerConsumer> logger, IMapper mapper, IMediator mediator)
     {
         _logger = logger;
         _queueSettings = queueSettings.Value;
@@ -47,7 +41,6 @@ public class WorkerConsumer : BackgroundService, IWorkerConsumer
             exclusive: false, 
             autoDelete: false);
 
-        _orderBookService= orderBookService;
         _mediator = mediator;
     }
 

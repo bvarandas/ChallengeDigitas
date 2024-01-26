@@ -1,3 +1,4 @@
+using ChallengeCrf.Api.Hubs;
 using OrderBook.API.Configurations;
 using OrderBook.Application.Commands;
 using OrderBook.Application.Interfaces;
@@ -28,21 +29,21 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.MapPost("api/orderbook/trade", async(OrderTradeCommand command, IOrderBookService service, ILogger<Program> logger ) =>
+app.MapPost("api/orderbook/trade", async (OrderTradeCommand command, IOrderBookService service, ILogger<Program> logger) =>
 {
     try
     {
-        //await service.
-
-        return Results.Accepted(null, command);
-    }catch(Exception ex)
+        var resultTrade = await service.OrderTradeAsync(command);
+        return Results.Accepted(null, resultTrade);
+    }
+    catch (Exception ex)
     {
         logger.LogError(ex, $"{ex.Message}");
         return Results.BadRequest(ex);
     }
-    
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+});
+
+app.UseCors("CorsPolicy");
+app.MapHub<BrokerHub>("/hubs/brokerhub");
 
 app.Run();

@@ -9,6 +9,8 @@ using OrderBook.Core.Enumerations;
 using OrderBook.Core.Specs;
 using Microsoft.Extensions.Options;
 using OrderBook.Application.Responses.Responses.Requests;
+using ChallengeCrf.Api.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace OrderBook.API.Bitstamp;
 public class WorkerConsumeBitstamp : BackgroundService
@@ -18,15 +20,18 @@ public class WorkerConsumeBitstamp : BackgroundService
     private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
     private readonly IQueueProducer _queueProducer;
     private readonly IOrderBookService _orderBookService;
+    private readonly IServiceProvider _serviceProvider;
     public WorkerConsumeBitstamp(IOptions<QueueCommandSettings> queueSettings, 
         ILogger<WorkerConsumeBitstamp> logger, 
         IQueueProducer queueProducer, 
-        IOrderBookService orderBookService)
+        IOrderBookService orderBookService,
+        IServiceProvider provider)
     {
         _logger = logger;
         _queueProducer = queueProducer;
         _queueSettings = queueSettings.Value;
         _orderBookService = orderBookService;
+        _serviceProvider = provider;
     }
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -45,7 +50,7 @@ public class WorkerConsumeBitstamp : BackgroundService
 
             using (var client = new WebsocketClient(communicator))
             {
-                SubscribeToStreams(client);
+                SubscribeToStreamsAsync(client);
 
                 communicator.ReconnectionHappened.Subscribe(async type =>
                 {
@@ -76,8 +81,10 @@ public class WorkerConsumeBitstamp : BackgroundService
         client.Send(new SubscribeRequest("ethusd", Channel.OrderBook));
     }
 
-    private void SubscribeToStreams(WebsocketClient client)
+    private async void SubscribeToStreamsAsync(WebsocketClient client)
     {
+        
+
         client.Streams.ErrorStream.Subscribe(x =>
                         Log.Warning($"Error received, message: {x?.Message}"));
 
@@ -104,13 +111,30 @@ public class WorkerConsumeBitstamp : BackgroundService
                             $"({x.Data?.Bids?.Length})");
             
             x.Data.Ticker = x.Symbol;
-            //_orderBookService.
+            
+            this.SendMessageClientAsync(x.Data);
+            
             _queueProducer.PublishMessage(x.Data);
 
         });
 
         client.Streams.HeartbeatStream.Subscribe(x =>
                 Log.Information($"Heartbeat received, product: {x?.Channel}, seq: {x?.Event}"));
+    }
+
+    private async Task SendMessageClientAsync(Application.Responses.Books.OrderBook orderBook)
+    {
+        using (var scope = _serviceProvider.CreateScope())
+        {
+            var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<BrokerHub>>();
+
+            if (orderBook.Ticker.StartsWith('b'))
+                await hubContext.Clients.Group("CrudMessage").SendAsync("ReceiveMessageBtc", orderBook);
+            else
+                await hubContext.Clients.Group("CrudMessage").SendAsync("ReceiveMessageEth", orderBook);
+
+            await _orderBookService.AddOrderBookCacheAsync(orderBook);
+        }
     }
 
     private static void CurrentDomain_ProcessExit(object? sender, EventArgs e)

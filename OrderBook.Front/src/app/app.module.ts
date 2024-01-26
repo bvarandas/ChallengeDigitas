@@ -7,6 +7,9 @@ import { OrderbookService } from './orderbook.service';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
 import { MatTabsModule } from '@angular/material/tabs'
 import { HttpClientModule } from '@angular/common/http';
+import { AppRoutingModule } from './app-routing.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -15,11 +18,14 @@ import { HttpClientModule } from '@angular/common/http';
   ],
   imports: [
     BrowserModule,
+    FormsModule,
+    AppRoutingModule,
     CurrencyMaskModule,
     MatTabsModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule
   ],
-  providers: [OrderbookService,OrderbookComponent],
+  providers: [HttpClientModule,OrderbookComponent,OrderbookService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

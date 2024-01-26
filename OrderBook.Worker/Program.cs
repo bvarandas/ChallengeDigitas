@@ -19,6 +19,7 @@ using OrderBook.Core.Repositories;
 using OrderBook.Infrastructure.Repositories;
 using OrderBook.Application.Commands;
 using OrderBook.Application.Handlers;
+using OrderBook.Application.Automapper;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
@@ -64,7 +65,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             });
 
             // Application
-            services.AddSingleton<IOrderBookService, OrderBookService>();
+            //services.AddSingleton<IOrderBookService, OrderBookService>();
             
             // Domain - Commands
             services.AddSingleton<IRequestHandler<InsertOrderBookCommand, Result<bool>>, InsertOrderBookCommandHandler>();
@@ -72,8 +73,10 @@ IHost host = Host.CreateDefaultBuilder(args)
             
             // Infra - Data
             services.AddSingleton<IOrderBookRepository, OrderBookRepository>();
-            services.AddSingleton< IOrderBookContext, OrderBookContext >();
+            services.AddSingleton<IOrderTradeRepository, OrderTradeRepository>();
 
+            services.AddSingleton< IOrderBookContext, OrderBookContext >();
+            services.AddSingleton<IOrderTradeContext, OrderTradeContext>();
             services.AddHostedService<WorkerConsumer>();
         }).Build();
 

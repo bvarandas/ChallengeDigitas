@@ -1,18 +1,19 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using OrderBook.Core.Enumerations;
+using OrderBook.Core.ValuesObject;
 
 namespace OrderBook.Core.Entities;
 
 public class OrderBook : BaseEntity
 {
-    public string Ticker { get; set; } = string.Empty;
+    public Ticker Ticker { get; set; }
     public DateTime Timestamp { get; set; }
     public DateTime Microtimestamp { get; set; }
     public BookLevel[] Bids { get; set; } = null!;
     public BookLevel[] Asks { get; set; } = null!;
 
-    public OrderBook(string ticker, DateTime timestamp, DateTime microtimestamp, BookLevel[] bids, BookLevel[] asks)
+    public OrderBook(Ticker ticker, DateTime timestamp, DateTime microtimestamp, BookLevel[] bids, BookLevel[] asks)
     {
         Ticker = ticker;
         Timestamp = timestamp;

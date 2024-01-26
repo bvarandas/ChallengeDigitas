@@ -6,7 +6,6 @@ using Websocket.Client;
 using OrderBook.API.Bitstamp.Responses;
 using OrderBook.Application.Responses.Json;
 using OrderBook.Application.Requests;
-using System;
 
 namespace OrderBook.API.Bitstamp.Client;
 
@@ -22,14 +21,9 @@ public class WebsocketClient : IDisposable
         _communicator = communicator;
         _messageReceivedSubscription = _communicator.MessageReceived.Subscribe(HandleMessage);
     }
-
     
     private bool HandleRawMessage(string msg)
     {
-        // ********************
-        // ADD RAW HANDLERS BELOW
-        // ********************
-
         return false;
     }
 

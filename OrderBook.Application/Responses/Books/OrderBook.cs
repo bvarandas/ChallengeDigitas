@@ -1,11 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+using Newtonsoft.Json;
 using OrderBook.Core.Enumerations;
 using ProtoBuf;
 
 namespace OrderBook.Application.Responses.Books;
 
 [ProtoContract]
-public class OrderBook
+public class OrderBook : BaseEntity
 {
     public OrderBook()
     {
@@ -47,6 +49,14 @@ public class OrderBook
 }
 
 [ProtoContract]
+public class BaseEntity
+{
+    [ProtoMember(6)]
+    public string Id { get; set; } = string.Empty;
+    public BaseEntity() { }
+}
+
+[ProtoContract]
 public class BookLevel
 {
     public BookLevel()
@@ -65,4 +75,7 @@ public class BookLevel
 
     [ProtoMember(4)]
     public long OrderId { get; set; }
+
+    [ProtoMember(5)]
+    public DateTime Timestamp { get; set; }
 }

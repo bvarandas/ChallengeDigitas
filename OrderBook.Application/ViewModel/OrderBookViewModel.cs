@@ -23,3 +23,13 @@ public class BookLevelViewModel
     public double Amount { get; set; }
     public long OrderId { get; set; }
 }
+
+public class OrderBookDataViewModel
+{
+    public string Ticker { get; set; }=string.Empty;
+    public double MaxPrice { get; set; }
+    public double MinPrice { get; set; }
+    public double AveragePrice { get; set; }
+    public double AveragePriceLast5Seconds { get; set; }
+    public double AverageAmountQuantity { get; set; }
+}
