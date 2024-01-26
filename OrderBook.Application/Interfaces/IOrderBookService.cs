@@ -7,4 +7,5 @@ public interface IOrderBookService
     Task<OrderBookViewModel> GetCashOrderBookIDAsync(string orderBookId);
     Task<OrderTradeViewModel> OrderTradeAsync(OrderTradeCommand command);
     Task AddOrderBookCacheAsync(Application.Responses.Books.OrderBook orderBook);
+    Task<OrderBookDataViewModel> GetOrderBookDataCacheAsync(string ticker);
 }

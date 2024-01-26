@@ -15,9 +15,10 @@ public class OrderBookService : IOrderBookService
     private readonly IOrderBookRepository _orderBookRepository;
     private readonly IOrderTradeRepository _orderTradeRepository;
     private ConcurrentDictionary<string, Application.Responses.Books.OrderBook> _dicOrderBook;
-    private readonly Thread _threadOrderBook;
-    private static TimeSpan _lastCycle;
-    private static readonly ManualResetEvent ExitEvent = new ManualResetEvent(false);
+    private ConcurrentQueue<Application.Responses.Books.OrderBook> _queueOrderBook;
+    private static ConcurrentDictionary<string, OrderBookDataViewModel> _dicOrderBookData;
+    private readonly Thread _threadOrderBook, _treadDequequeOrderBook;
+    private readonly SemaphoreSlim _semaphore;
     public OrderBookService(IMapper mapper, 
         IOrderBookRepository orderBookRepository,
         IOrderTradeRepository orderTradeRepository,
@@ -29,9 +30,16 @@ public class OrderBookService : IOrderBookService
         _logger = logger;
         
         _dicOrderBook = new ConcurrentDictionary<string, Responses.Books.OrderBook>();
-        
+        _dicOrderBookData = new ConcurrentDictionary<string, OrderBookDataViewModel>();
+        _semaphore = new SemaphoreSlim(1, 2);
+
         _threadOrderBook = new Thread(new ThreadStart(OrderBookCacheAsync));
+        _threadOrderBook.Name = "OrderBookCacheAsync";
         _threadOrderBook.Start();
+
+        _treadDequequeOrderBook = new Thread(new ThreadStart(DequeueOrderBookCacheAsync));
+        _treadDequequeOrderBook.Name = "DequeueOrderBookCacheAsync";
+        _treadDequequeOrderBook.Start();
     }
 
     private async Task<(IList<BookLevel>, double)> GetQuotesBidAsync(Core.ValuesObject.Ticker ticker,double quantityRequest)
@@ -70,21 +78,80 @@ public class OrderBookService : IOrderBookService
         return result;
     }
 
+    private async void DequeueOrderBookCacheAsync()
+    {
+        while (true)
+        {
+            await _semaphore.WaitAsync();
+           
+            while (_queueOrderBook.TryDequeue(out var orderBook))
+            {
+                var now = DateTime.Now;
+
+                var book= _dicOrderBook[orderBook.Ticker];
+
+                var listAsk = book.Asks.ToList();
+                var listBids = book.Bids.ToList();
+                orderBook.Asks.ToList().ForEach(x =>
+                {
+                    x.Timestamp = now;
+                    listAsk.Add(x);
+                });
+                orderBook.Bids.ToList().ForEach(x =>
+                {
+                    x.Timestamp = now;
+                    listBids.Add(x);
+                });
+                book.Asks = listAsk.ToArray();
+                book.Bids = listBids.ToArray();
+            }
+
+            _semaphore.Release();
+            
+            Thread.Sleep(1000);
+        }
+    }
+
     private async void OrderBookCacheAsync()
     {
-        _lastCycle = DateTime.Now.TimeOfDay;
+        TimeSpan lastCycle = DateTime.Now.TimeOfDay;
         while (true)
         {
             DateTime now = DateTime.Now;
-
-            if ((now.TimeOfDay - _lastCycle).TotalSeconds >= 5)
+            
+            await _semaphore.WaitAsync();
+            
+            if ((now.TimeOfDay - lastCycle).TotalSeconds >= 5)
             {
-                _lastCycle = now.TimeOfDay;
+                lastCycle = now.TimeOfDay;
                 await RemoveOldOrderBookCacheAsync();
                 await SortOrderBookCacheAsync();
+                await UpdateOrderBookDataCacheAsync();
             }
+            _semaphore.Release();
 
             Thread.Sleep(1000);
+        }
+    }
+
+    
+
+    private async Task UpdateOrderBookDataCacheAsync()
+    {
+        foreach (KeyValuePair<string, OrderBookDataViewModel> kvp in _dicOrderBookData)
+        {
+            var orderBook       = _dicOrderBook[kvp.Key];
+            kvp.Value.Ticker    = orderBook.Ticker;
+            kvp.Value.MinPrice  = orderBook.Bids.FirstOrDefault().Price;
+            kvp.Value.MaxPrice  = orderBook.Asks.FirstOrDefault().Price;
+            
+            var average         = (orderBook.Asks.Take(100).Average(x => x.Price) + orderBook.Bids.Take(100).Average(x => x.Price))/2;
+            var average5Seconds = (orderBook.Asks.Average(x => x.Price) + orderBook.Bids.Average(x => x.Price)) / 2;
+            var averageQuanity  = (orderBook.Asks.Average(x => x.Amount) + orderBook.Bids.Average(x => x.Amount)) / 2;
+
+            kvp.Value.AveragePrice              = average;
+            kvp.Value.AveragePriceLast5Seconds  = average5Seconds;
+            kvp.Value.AverageAmountQuantity     = averageQuanity;
         }
     }
     private async Task SortOrderBookCacheAsync()
@@ -107,37 +174,19 @@ public class OrderBookService : IOrderBookService
             kvp.Value.Bids = kvp.Value.Bids.Except(bidsToRemove).ToArray();
         }
     }
-    public async Task<OrderBookDataViewModel> GetOrderBookDataCacheAsync()
+    public async Task<OrderBookDataViewModel> GetOrderBookDataCacheAsync(string ticker)
     {
-        var result = new OrderBookDataViewModel();
-
-
-
-        return result;
+        return _dicOrderBookData[ticker]; 
     }
+    
     public async Task AddOrderBookCacheAsync(Application.Responses.Books.OrderBook orderBook)
     {
-        if (_dicOrderBook.TryGetValue(orderBook.Ticker, out Responses.Books.OrderBook book))
-        {
-            //var now = DateTime.Now;
-
-            //var listAsk = book.Asks.ToList();
-            //var listBids = book.Bids.ToList();
-            //orderBook.Asks.ToList().ForEach(x => 
-            //{
-            //    x.Timestamp = now;
-            //    listAsk.Add(x);
-            //});
-            //orderBook.Bids.ToList().ForEach(x => 
-            //{ 
-            //    x.Timestamp = now;
-            //    listBids.Add(x);
-            //});
-        }
-        else
+        if (!_dicOrderBook.TryGetValue(orderBook.Ticker, out Responses.Books.OrderBook book))
         {
             _dicOrderBook.TryAdd(orderBook.Ticker, orderBook);
+            _dicOrderBookData.TryAdd(orderBook.Ticker, new OrderBookDataViewModel());
         }
+        _queueOrderBook.Enqueue(orderBook);
     }
 
     public Task<OrderBookViewModel> GetCashOrderBookIDAsync(string orderBookId)
