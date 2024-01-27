@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-01-26T19:04:53.011Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" etag="a_U0m8UaF8s5YSaCmIRr" version="23.0.2" type="device">
+<mxfile host="app.diagrams.net" modified="2024-01-27T02:20:47.018Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" etag="tJ3ZH41fy_pEWxiARJWw" version="23.0.2" type="device">
   <diagram name="Page-1" id="_itZItrVJ1elG1FdDYki">
-    <mxGraphModel dx="3080" dy="2860" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1027" dy="948" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -101,13 +101,13 @@
           </mxCell>
         </object>
         <object placeholders="1" c4Type="Relationship" c4Technology="JSON/WSS - Websocket" c4Description="Subscreve e recebe os dados &#xa;de cotação de criptomoedas" label="&lt;div style=&quot;text-align: left&quot;&gt;&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;&lt;/div&gt;" id="UZZ4lOpofhkEnz_8vrWL-25">
-          <mxCell style="endArrow=blockThin;html=1;fontSize=10;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;elbow=vertical;metaEdit=1;endSize=14;startSize=14;jumpStyle=arc;jumpSize=16;rounded=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="UZZ4lOpofhkEnz_8vrWL-24">
+          <mxCell style="endArrow=blockThin;html=1;fontSize=10;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;elbow=vertical;metaEdit=1;endSize=14;startSize=14;jumpStyle=arc;jumpSize=16;rounded=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="UZZ4lOpofhkEnz_8vrWL-5" target="UZZ4lOpofhkEnz_8vrWL-24">
             <mxGeometry width="240" relative="1" as="geometry">
               <mxPoint x="1010" y="240" as="sourcePoint" />
               <mxPoint x="770" y="320" as="targetPoint" />
               <Array as="points">
                 <mxPoint x="1010" y="210" />
-                <mxPoint x="650" y="210" />
+                <mxPoint x="715" y="210" />
               </Array>
             </mxGeometry>
           </mxCell>

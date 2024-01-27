@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  orderbook.api:
+  orderbook-api:
     image: ${DOCKER_REGISTRY-}orderbookapi
     build:
       context: .
@@ -19,16 +19,15 @@ services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
   
-  ocelot.apigateway:
+  ocelot-apigateway:
     image: ${DOCKER_REGISTRY-}ocelotapigateway
     build:
       context: .
       dockerfile: Ocelot.ApiGateway/Dockerfile
 
   
-  orderbook.worker:
+  orderbook-worker:
     image: ${DOCKER_REGISTRY-}orderbookworker
     build:
       context: .
       dockerfile: OrderBook.Worker/Dockerfile
-

@@ -6,7 +6,7 @@
     <ProjectGuid>9ed1f818-d1f8-46c5-b74f-5e6be71aae67</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
-    <DockerServiceName>ocelot.apigateway</DockerServiceName>
+    <DockerServiceName>ocelot-apigateway</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

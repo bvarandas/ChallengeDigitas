@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  orderbook.api:
+  orderbook-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
@@ -13,11 +13,11 @@ services:
     networks:
       - challenge
 
-  ocelot.apigateway:
+  ocelot-apigateway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
-      - orderbook.api
+      - orderbook-api
     ports:
       - "9010:80"
   
@@ -79,7 +79,7 @@ services:
     ports:
       - "5601:5601"
   
-  orderbook.worker:
+  orderbook-worker:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
@@ -90,8 +90,8 @@ services:
       - "5303:5303"
     networks:
       - challenge
-
-
+  
+  
 volumes:
   mongo_data:
   elasticsearch-data:

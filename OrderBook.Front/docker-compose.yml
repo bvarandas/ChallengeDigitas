@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  orderbook-front:
+    image: orderbook-front
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 4200:80
