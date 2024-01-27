@@ -46,3 +46,7 @@ Container
 
 Componentes
 ![OrderBookSystem-Component drawio](https://github.com/bvarandas/ChallengeDigitas/assets/13907905/42369dce-8f9b-4995-8521-dbd064b0dd1f)
+
+
+não consegui criar um novo user para criação de ACR e AKS
+![image](https://github.com/bvarandas/ChallengeDigitas/assets/13907905/6ce402a0-aa3b-4f6f-ab6d-fe7eb61dfd64)
