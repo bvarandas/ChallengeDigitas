@@ -24,8 +24,8 @@ public class InsertOrderTradeCommand : OrderTradeCommand, IRequest<Result<bool>>
     public string Id { get; set; }
     public IList<BookLevelCommand> Quotes { get; set; }
     public double AmountShaved { get; set; }
-
-    public InsertOrderTradeCommand(string id,string ticker, double quantityRequested, TradeSide tradeSide, IList<BookLevelCommand> quotes, double amountShaved)
+    public double TotalPriceShaved {  get; set; }
+    public InsertOrderTradeCommand(string id,string ticker, double quantityRequested, TradeSide tradeSide, IList<BookLevelCommand> quotes, double amountShaved, double totalPriceShaved)
     {
         Id = id;
         Ticker = ticker;
@@ -33,5 +33,6 @@ public class InsertOrderTradeCommand : OrderTradeCommand, IRequest<Result<bool>>
         TradeSide = tradeSide;
         Quotes = quotes;
         AmountShaved = amountShaved;
+        TotalPriceShaved = totalPriceShaved;
     }
 }

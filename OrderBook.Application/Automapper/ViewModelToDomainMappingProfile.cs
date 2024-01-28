@@ -23,7 +23,7 @@ public class ViewModelToDomainMappingProfile : Profile
         CreateMap<UpdateOrderBookCommand, OrderBookRoot>();
         CreateMap<InsertOrderBookCommand, OrderBookRoot>();
         CreateMap<OrderTradeCommand, OrderTrade>()
-            .ConstructUsing(c=> new OrderTrade(c.Ticker, c.QuantityRequested, c.TradeSide,null!,0));
+            .ConstructUsing(c=> new OrderTrade(c.Ticker, c.QuantityRequested, c.TradeSide,null!,0, 0));
 
         CreateMap<InsertOrderTradeCommand, OrderTrade>();
             //.ConstructUsing(c => new OrderBook.Core.Entities.OrderTrade(c.Ticker, c.QuantityRequested, c.TradeSide, c.Quotes, c.AmountShaved ));

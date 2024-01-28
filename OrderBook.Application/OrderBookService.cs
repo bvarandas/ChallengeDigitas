@@ -151,11 +151,11 @@ public class OrderBookService : IOrderBookService
             
             var average         = (orderBook.Asks.Take(100).Average(x => x.Price) + orderBook.Bids.Take(100).Average(x => x.Price))/2;
             var average5Seconds = (orderBook.Asks.Average(x => x.Price) + orderBook.Bids.Average(x => x.Price)) / 2;
-            var averageQuanity  = (orderBook.Asks.Average(x => x.Amount) + orderBook.Bids.Average(x => x.Amount)) / 2;
+            var averageQuantity  = (orderBook.Asks.Average(x => x.Amount) + orderBook.Bids.Average(x => x.Amount)) / 2;
 
             kvp.Value.AveragePrice              = average;
             kvp.Value.AveragePriceLast5Seconds  = average5Seconds;
-            kvp.Value.AverageAmountQuantity     = averageQuanity;
+            kvp.Value.AverageAmountQuantity     = averageQuantity;
         }
     }
     private async Task SortOrderBookCacheAsync()
@@ -215,9 +215,12 @@ public class OrderBookService : IOrderBookService
             
             var entity = _mapper.Map<OrderTradeCommand, OrderTrade>(command);
             var listBookLevel = _mapper.Map<IList<OrderBook.Application.Responses.Books.BookLevel>, IList<BookLevelCommand>>(quotations.Result.Item1);
-            var quotes = listBookLevel;
+            double totalPriceShaved = 0.0;
+
+            listBookLevel.ToList().ForEach(quote=> { totalPriceShaved += (quote.Amount * quote.Price);});
+            
             var amountShaved = quotations.Result.Item2;
-            var insertCommand = new InsertOrderTradeCommand(ObjectId.GenerateNewId().ToString(), command.Ticker, command.QuantityRequested, command.TradeSide, listBookLevel, amountShaved);
+            var insertCommand = new InsertOrderTradeCommand(ObjectId.GenerateNewId().ToString(), command.Ticker, command.QuantityRequested, command.TradeSide, listBookLevel, amountShaved, totalPriceShaved);
             var result = _mediator.Send(insertCommand);
             
             resultObject = _mapper.Map<InsertOrderTradeCommand, OrderTradeViewModel>(insertCommand);

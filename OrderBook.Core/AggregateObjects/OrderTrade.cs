@@ -8,14 +8,16 @@ public class OrderTrade : BaseEntity
     public TradeSide TradeSide { get; set; }
     public IList<BookLevel> Quotes { get; set; }
     public double AmountShaved { get; set; }
+    public double TotalPriceShaved { get; set; }
     public OrderTrade() { }
 
-    public OrderTrade(string ticker, double quantityRequested, TradeSide tradeSide, IList<BookLevel> quotes, double amountShaved)
+    public OrderTrade(string ticker, double quantityRequested, TradeSide tradeSide, IList<BookLevel> quotes, double amountShaved, double totalPriceShaved)
     {
         Ticker = ticker;
         QuantityRequested = quantityRequested;
         TradeSide = tradeSide;
         Quotes = quotes;
         AmountShaved = amountShaved;
+        TotalPriceShaved = totalPriceShaved;
     }
 }

@@ -11,7 +11,8 @@ public class OrderTradeViewModel
     public double QuantityRequested { get; set; }
     public TradeSide TradeSide { get; set; }
     public double AmountShaved { get; set; }
-    public OrderTradeViewModel(string id, string ticker, IList<BookLevelViewModel> quotes, double quantityRequested, TradeSide tradeSide, double amountShaved)
+    public double TotalPriceShaved { get; set; }
+    public OrderTradeViewModel(string id, string ticker, IList<BookLevelViewModel> quotes, double quantityRequested, TradeSide tradeSide, double amountShaved, double totalPriceShaved)
     {
         Id = id;
         Ticker = ticker;
@@ -19,6 +20,7 @@ public class OrderTradeViewModel
         QuantityRequested = quantityRequested;
         TradeSide = tradeSide;
         AmountShaved = amountShaved;
+        TotalPriceShaved = totalPriceShaved;
     }
 
     public OrderTradeViewModel() { }
