@@ -1,16 +1,16 @@
-﻿using OrderBook.Core.Enumerations;
-using OrderBook.Core.ValuesObject;
-namespace OrderBook.Core.Entities;
+﻿using OrderBook.Core.Entities;
+using OrderBook.Core.Enumerations;
+namespace OrderBook.Core.AggregateObjects;
 public class OrderTrade : BaseEntity
 {
-    public Ticker Ticker { get; set; } = null!;
+    public string Ticker { get; set; } = null!;
     public double QuantityRequested { get; set; }
     public TradeSide TradeSide { get; set; }
     public IList<BookLevel> Quotes { get; set; }
     public double AmountShaved { get; set; }
     public OrderTrade() { }
 
-    public OrderTrade(Ticker ticker, double quantityRequested, TradeSide tradeSide, IList<BookLevel> quotes, double amountShaved)
+    public OrderTrade(string ticker, double quantityRequested, TradeSide tradeSide, IList<BookLevel> quotes, double amountShaved)
     {
         Ticker = ticker;
         QuantityRequested = quantityRequested;

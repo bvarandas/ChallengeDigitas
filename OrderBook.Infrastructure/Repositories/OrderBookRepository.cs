@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using OrderBook.Core.Specs;
 using OrderBook.Infrastructure.Data;
 using Microsoft.Extensions.Logging;
+using OrderBook.Core.AggregateObjects;
 
 namespace OrderBook.Infrastructure.Repositories;
 
@@ -17,16 +18,16 @@ public class OrderBookRepository : IOrderBookRepository
         _logger = logger;
     }
 
-    public async Task<bool> CreateOrderBook(Core.Entities.OrderBook orderBook)
+    public async Task<bool> CreateOrderBook(Core.AggregateObjects.OrderBookRoot orderBook)
     {
-        string ticker = orderBook.Ticker.ticker;
-        var inserts = new List<WriteModel<Core.Entities.OrderBook>>();
-        var filterBuilder = Builders<Core.Entities.OrderBook>.Filter;
+        string ticker = orderBook.Ticker;
+        var inserts = new List<WriteModel<OrderBookRoot>>();
+        var filterBuilder = Builders<OrderBookRoot>.Filter;
         bool result = false;
-        var filter = filterBuilder.Where(x => x.Ticker.ticker == ticker);
+        var filter = filterBuilder.Where(x => x.Ticker == ticker);
         try
         {
-            inserts.Add(new InsertOneModel<Core.Entities.OrderBook>(orderBook));
+            inserts.Add(new InsertOneModel<OrderBookRoot>(orderBook));
 
             var insertResult = await _context.OrderBooks.BulkWriteAsync(inserts);
             result = insertResult.IsAcknowledged && insertResult.ModifiedCount > 0;
@@ -39,9 +40,9 @@ public class OrderBookRepository : IOrderBookRepository
         return result;
     }
 
-    public async Task<IEnumerable<Core.Entities.OrderBook>> GetOrderBooks(OrderBookSpecParams specParams)
+    public async Task<IEnumerable<OrderBookRoot>> GetOrderBooks(OrderBookSpecParams specParams)
     {
-        var builder = Builders<Core.Entities.OrderBook>.Filter;
+        var builder = Builders<OrderBookRoot>.Filter;
         var filter = builder.Empty;
 
         if (!string.IsNullOrEmpty(specParams.Search))
@@ -52,14 +53,14 @@ public class OrderBookRepository : IOrderBookRepository
         return _context.OrderBooks.Find(filter).ToEnumerable();
     }
 
-    public async Task<bool> UpdateOrderBook(Core.Entities.OrderBook orderBook)
+    public async Task<bool> UpdateOrderBook(OrderBookRoot orderBook)
     {
-        string ticker = orderBook.Ticker.ticker;
-        var updates = new List<WriteModel<Core.Entities.OrderBook>>();
-        var filterBuilder = Builders<Core.Entities.OrderBook>.Filter;
+        string ticker = orderBook.Ticker;
+        var updates = new List<WriteModel<OrderBookRoot>>();
+        var filterBuilder = Builders<OrderBookRoot>.Filter;
 
-        var filter = filterBuilder.Where(x => x.Ticker.ticker == ticker);
-        updates.Add(new ReplaceOneModel<Core.Entities.OrderBook>(filter, orderBook));
+        var filter = filterBuilder.Where(x => x.Ticker == ticker);
+        updates.Add(new ReplaceOneModel<OrderBookRoot>(filter, orderBook));
 
         var updateResult = await _context.OrderBooks.BulkWriteAsync(updates);
 

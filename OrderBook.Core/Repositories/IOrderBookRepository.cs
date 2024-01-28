@@ -1,8 +1,9 @@
-﻿using OrderBook.Core.Specs;
+﻿using OrderBook.Core.AggregateObjects;
+using OrderBook.Core.Specs;
 namespace OrderBook.Core.Repositories;
 public interface IOrderBookRepository
 {
-    Task<IEnumerable<Core.Entities.OrderBook>> GetOrderBooks(OrderBookSpecParams specParams);
-    Task<bool> CreateOrderBook(Core.Entities.OrderBook orderBooks);
-    Task<bool> UpdateOrderBook(Core.Entities.OrderBook orderBooks);
+    Task<IEnumerable<OrderBookRoot>> GetOrderBooks(OrderBookSpecParams specParams);
+    Task<bool> CreateOrderBook(OrderBookRoot orderBooks);
+    Task<bool> UpdateOrderBook(OrderBookRoot orderBooks);
 }

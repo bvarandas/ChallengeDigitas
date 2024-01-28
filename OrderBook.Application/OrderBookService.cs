@@ -7,6 +7,7 @@ using OrderBook.Application.Handlers;
 using OrderBook.Application.Interfaces;
 using OrderBook.Application.Responses.Books;
 using OrderBook.Application.ViewModel;
+using OrderBook.Core.AggregateObjects;
 using OrderBook.Core.Repositories;
 using OrderBook.Infrastructure.Repositories;
 using System.Collections.Concurrent;
@@ -47,11 +48,11 @@ public class OrderBookService : IOrderBookService
         _queueOrderBook = new ConcurrentQueue<Responses.Books.OrderBook>();
     }
 
-    private async Task<(IList<BookLevel>, double)> GetQuotesBidAsync(Core.ValuesObject.Ticker ticker,double quantityRequest)
+    private async Task<(IList<BookLevel>, double)> GetQuotesBidAsync(string ticker,double quantityRequest)
     {
         var result = (new List<BookLevel>(), 0.0);
         double quantityCollected = 0.0;
-        if (_dicOrderBook.TryGetValue(ticker.ticker, out Responses.Books.OrderBook orderBook))
+        if (_dicOrderBook.TryGetValue(ticker, out Responses.Books.OrderBook orderBook))
         {
             Array.ForEach(orderBook.Bids, bid => { 
                 if (quantityRequest > quantityCollected && (quantityCollected + bid.Amount) < quantityRequest)
@@ -66,11 +67,11 @@ public class OrderBookService : IOrderBookService
         return result;
     }
 
-    private async Task<(IList<BookLevel>, double)> GetQuotesAskAsync(Core.ValuesObject.Ticker ticker,double quantityRequest)
+    private async Task<(IList<BookLevel>, double)> GetQuotesAskAsync(string ticker,double quantityRequest)
     {
         var result = (new List<BookLevel>(), 0.0);
         double AmountCollected = 0.0;
-        if (_dicOrderBook.TryGetValue(ticker.ticker, out Responses.Books.OrderBook orderBook))
+        if (_dicOrderBook.TryGetValue(ticker, out Responses.Books.OrderBook orderBook))
         {
             Array.ForEach(orderBook.Asks, ask => {
                 if (quantityRequest > AmountCollected && (AmountCollected + ask.Amount) < quantityRequest)
@@ -212,7 +213,7 @@ public class OrderBookService : IOrderBookService
                 GetQuotesBidAsync(command.Ticker, command.QuantityRequested);
 
             
-            var entity = _mapper.Map<OrderTradeCommand, Core.Entities.OrderTrade>(command);
+            var entity = _mapper.Map<OrderTradeCommand, OrderTrade>(command);
             var listBookLevel = _mapper.Map<IList<OrderBook.Application.Responses.Books.BookLevel>, IList<BookLevelCommand>>(quotations.Result.Item1);
             var quotes = listBookLevel;
             var amountShaved = quotations.Result.Item2;

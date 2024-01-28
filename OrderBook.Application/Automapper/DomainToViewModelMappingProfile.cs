@@ -2,15 +2,17 @@
 using OrderBook.Application.Commands;
 using OrderBook.Application.Responses.Books;
 using OrderBook.Application.ViewModel;
+using OrderBook.Core.AggregateObjects;
+
 namespace OrderBook.Application.Automapper;
 public class DomainToViewModelMappingProfile : Profile
 {
     public DomainToViewModelMappingProfile()
     {
-        CreateMap<OrderBook.Core.Entities.OrderBook, OrderBookViewModel>();
-        CreateMap<OrderBook.Core.Entities.BookLevel, BookLevelViewModel>();
-        CreateMap<OrderBook.Core.Entities.BookLevel, BookLevel>();
-        CreateMap<OrderBook.Core.Entities.OrderTrade, OrderTradeViewModel>();
+        CreateMap<OrderBookRoot, OrderBookViewModel>();
+        CreateMap<Core.Entities.BookLevel, BookLevelViewModel>();
+        CreateMap<Core.Entities.BookLevel, Application.Responses.Books.BookLevel>();
+        CreateMap<OrderTrade, OrderTradeViewModel>();
 
         CreateMap<InsertOrderTradeCommand, OrderTradeViewModel>();
         CreateMap<BookLevelCommand, BookLevelViewModel>();

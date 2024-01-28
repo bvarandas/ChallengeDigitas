@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using OrderBook.Core.AggregateObjects;
 using OrderBook.Core.Entities;
 using OrderBook.Core.Repositories;
 using OrderBook.Infrastructure.Data;
@@ -17,14 +18,14 @@ public class OrderTradeRepository : IOrderTradeRepository
     }
     public async Task<bool> CreateOrderTradeAsync(OrderTrade orderTrade)
     {
-        string ticker = orderTrade.Ticker.ticker;
-        var inserts = new List<WriteModel<Core.Entities.OrderTrade>>();
-        var filterBuilder = Builders<Core.Entities.OrderTrade>.Filter;
+        string ticker = orderTrade.Ticker;
+        var inserts = new List<WriteModel<OrderTrade>>();
+        var filterBuilder = Builders<OrderTrade>.Filter;
         bool result = false;
-        var filter = filterBuilder.Where(x => x.Ticker.ticker == ticker);
+        var filter = filterBuilder.Where(x => x.Ticker == ticker);
         try
         {
-            inserts.Add(new InsertOneModel<Core.Entities.OrderTrade>(orderTrade));
+            inserts.Add(new InsertOneModel<OrderTrade>(orderTrade));
 
             var insertResult = await _context.OrderTrade.BulkWriteAsync(inserts);
             result = insertResult.IsAcknowledged && insertResult.ModifiedCount > 0;

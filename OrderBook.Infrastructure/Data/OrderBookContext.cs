@@ -6,14 +6,14 @@ namespace OrderBook.Infrastructure.Data;
 
 public class OrderBookContext : IOrderBookContext
 {
-    public IMongoCollection<Core.Entities.OrderBook> OrderBooks { get; }
+    public IMongoCollection<Core.AggregateObjects.OrderBookRoot> OrderBooks { get; }
 
     public OrderBookContext (IConfiguration configuration )
     {
         var client = new MongoClient(configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
         var database = client.GetDatabase(configuration.GetValue<string>("DatabaseSettings:DatabaseName"));
 
-        OrderBooks = database.GetCollection<Core.Entities.OrderBook>(
+        OrderBooks = database.GetCollection<Core.AggregateObjects.OrderBookRoot>(
             configuration.GetValue<string>("DatabaseSettings:CollectionName"));
     }
 }

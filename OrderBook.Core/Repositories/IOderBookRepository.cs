@@ -2,5 +2,5 @@
 namespace OrderBook.Core.Repositories;
 public interface IOrderTradeRepository
 {
-    Task<bool> CreateOrderTradeAsync(Core.Entities.OrderTrade orderTrade);
+    Task<bool> CreateOrderTradeAsync(Core.AggregateObjects.OrderTrade orderTrade);
 }

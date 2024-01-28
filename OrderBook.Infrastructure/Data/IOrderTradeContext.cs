@@ -2,5 +2,5 @@
 namespace OrderBook.Infrastructure.Data;
 public  interface IOrderTradeContext
 {
-    IMongoCollection<Core.Entities.OrderTrade> OrderTrade { get; }
+    IMongoCollection<Core.AggregateObjects.OrderTrade> OrderTrade { get; }
 }
