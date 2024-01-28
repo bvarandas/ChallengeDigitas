@@ -3,16 +3,27 @@ Projeto de desafio porposto para teste.
 
 
 Padrões Criacionais usados:
+
 Singleton
 
-Padrões Comportmentais
+Padrões Estrtuturais :
+
+Flyweight (OU algo parecido)
+
+Padrões Comportmentais:
+
 Command
-Mediator 
+
+Mediator
+
+Observer
+
 
 Mais
+
 Ioc - Inversão de controle (Removido)
 
-CQRS - com Coreografia
+CQRS - com Coreografia, Mensageria
 
 Injeção de depedencia
 
@@ -20,7 +31,7 @@ Unit of Work (Removido)
 
 Event Sourcing (removido)
 
-Alguns conceitos de solid tbm foram usados.
+Alguns conceitos de S.O.L.I.D. tbm foram usados.
 
 kind create cluster
 
