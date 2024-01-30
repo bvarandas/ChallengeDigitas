@@ -2,7 +2,6 @@
 using FluentResults;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using OrderBook.Application.Commands;
 using OrderBook.Core.AggregateObjects;
 using OrderBook.Core.Repositories;
@@ -22,6 +21,12 @@ public class InsertOrderBookCommandHandler : IRequestHandler<InsertOrderBookComm
 
     public async Task<Result<bool>> Handle(InsertOrderBookCommand command, CancellationToken cancellationToken)
     {
+        var validation = command.Validation();
+        if (!validation.IsValid)
+        {
+            //validation.Errors.
+        }
+
         var orderBookToInsert = _mapper.Map<InsertOrderBookCommand, OrderBookRoot>(command);
         await _orderBookRepository.CreateOrderBook(orderBookToInsert);
         _logger.LogInformation($"Order Book {orderBookToInsert.Ticker}");
@@ -42,6 +47,12 @@ public class InsertOrderTradeCommandHandler : IRequestHandler<InsertOrderTradeCo
     }
     public async Task<Result<bool>> Handle(InsertOrderTradeCommand command, CancellationToken cancellationToken)
     {
+        var validation = command.Validation();
+
+        if (!validation.IsValid)
+        {
+
+        }
         var orderBookToInsert = _mapper.Map<InsertOrderTradeCommand, OrderTrade>(command);
         //orderBookToInsert.Id = ObjectId.GenerateNewId().ToString();
         await _orderTradeRepository.CreateOrderTradeAsync(orderBookToInsert);

@@ -37,6 +37,8 @@ public class OrderBookService : IOrderBookService
         _dicOrderBookData = new ConcurrentDictionary<string, OrderBookDataViewModel>();
         _semaphore = new SemaphoreSlim(1, 2);
 
+        _queueOrderBook = new ConcurrentQueue<Responses.Books.OrderBook>();
+
         _threadOrderBook = new Thread(new ThreadStart(OrderBookCacheAsync));
         _threadOrderBook.Name = "OrderBookCacheAsync";
         _threadOrderBook.Start();
@@ -45,7 +47,6 @@ public class OrderBookService : IOrderBookService
         _treadDequequeOrderBook.Name = "DequeueOrderBookCacheAsync";
         _treadDequequeOrderBook.Start();
 
-        _queueOrderBook = new ConcurrentQueue<Responses.Books.OrderBook>();
     }
 
     private async Task<(IList<BookLevel>, double)> GetQuotesBidAsync(string ticker,double quantityRequest)
@@ -234,7 +235,7 @@ public class OrderBookService : IOrderBookService
     }
 }
 
-class AsksComparer : IComparer<BookLevel>
+public class AsksComparer : IComparer<BookLevel>
 {
     public int Compare(BookLevel? x, BookLevel? y)
     {
@@ -244,7 +245,7 @@ class AsksComparer : IComparer<BookLevel>
     }
 }
 
-class BidsComparer : IComparer<BookLevel>
+public class BidsComparer : IComparer<BookLevel>
 {
     public int Compare(BookLevel? x, BookLevel? y)
     {

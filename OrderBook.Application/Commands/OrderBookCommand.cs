@@ -1,5 +1,8 @@
 ﻿using FluentResults;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
+using OrderBook.Application.Validations;
 using OrderBook.Application.ViewModel;
 using OrderBook.Core.Enumerations;
 namespace OrderBook.Application.Commands;
@@ -10,6 +13,8 @@ public abstract class OrderBookCommand
     public DateTime Microtimestamp { get; set; }
     public BookLevelCommand[] Bids { get; set; } = null!;
     public BookLevelCommand[] Asks { get; set; } = null!;
+    public abstract ValidationResult Validation();
+    public ValidationResult ValidationResult { get; set; } = null!;
 }
 public class BookLevelCommand
 {
@@ -32,6 +37,12 @@ public class InsertOrderBookCommand : OrderBookCommand, IRequest<Result<bool>>
         Bids = bids;
         Asks = asks;
     }
+
+    public override ValidationResult Validation()
+    {
+        ValidationResult = new InsertOrderBookCommandValidation().Validate(this);
+        return ValidationResult;
+    }
 }
 public class UpdateOrderBookCommand : OrderBookCommand, IRequest<Result<bool>> 
 {
@@ -42,5 +53,11 @@ public class UpdateOrderBookCommand : OrderBookCommand, IRequest<Result<bool>>
         Microtimestamp = microtimestamp;
         Bids = bids;
         Asks = asks;
+    }
+
+    public override ValidationResult Validation()
+    {
+        ValidationResult = new UpdateOrderBookCommandValidation().Validate(this);
+        return ValidationResult;
     }
 }

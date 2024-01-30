@@ -1,16 +1,17 @@
 ﻿using FluentResults;
+using FluentValidation.Results;
 using MediatR;
+using OrderBook.Application.Validations;
 using OrderBook.Core.Enumerations;
-using OrderBook.Core.ValuesObject;
 namespace OrderBook.Application.Commands;
-public class OrderTradeCommand
+public abstract class OrderTradeCommand
 {
     public string Ticker { get; set; } = null!;
     public double QuantityRequested { get; set; }
     public TradeSide TradeSide { get; set; }
-
+    public abstract ValidationResult Validation();
+    public ValidationResult ValidationResult { get; set; } = null!;
     public OrderTradeCommand() { }
-
     public OrderTradeCommand(string ticker, double quantityRequested, TradeSide tradeSide)
     {
         Ticker = ticker;
@@ -34,5 +35,11 @@ public class InsertOrderTradeCommand : OrderTradeCommand, IRequest<Result<bool>>
         Quotes = quotes;
         AmountShaved = amountShaved;
         TotalPriceShaved = totalPriceShaved;
+    }
+
+    public override ValidationResult Validation()
+    {
+        ValidationResult = new InsertOrderTradeCommandValidation().Validate(this);
+        return ValidationResult;
     }
 }

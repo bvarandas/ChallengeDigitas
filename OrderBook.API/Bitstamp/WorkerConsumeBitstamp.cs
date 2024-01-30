@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using OrderBook.Application.Responses.Responses.Requests;
 using ChallengeCrf.Api.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using OrderBook.Application;
 
 namespace OrderBook.API.Bitstamp;
 public class WorkerConsumeBitstamp : BackgroundService
@@ -114,8 +115,10 @@ public class WorkerConsumeBitstamp : BackgroundService
             
             x.Data.Ticker = x.Symbol;
             
+            Array.Sort(x.Data.Asks, new AsksComparer());
+            Array.Sort(x.Data.Bids, new BidsComparer());
+
             this.SendMessageClientAsync(x.Data);
-            
             _queueProducer.PublishMessage(x.Data);
 
         });

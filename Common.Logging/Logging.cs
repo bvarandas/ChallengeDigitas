@@ -16,7 +16,7 @@ public static class Logging
             loggerConfiguration.MinimumLevel.Information()
             .Enrich.FromLogContext()
             .Enrich.WithProperty("ApplpicationName", env.ApplicationName)
-            .Enrich.WithProperty("ApplpicationName", env.EnvironmentName)
+            .Enrich.WithProperty("EnvironmentName", env.EnvironmentName)
             .Enrich.WithExceptionDetails()
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
@@ -24,7 +24,8 @@ public static class Logging
 
             if (context.HostingEnvironment.IsDevelopment())
             {
-                loggerConfiguration.MinimumLevel.Override("OrderBook", LogEventLevel.Error);
+                loggerConfiguration.MinimumLevel.Override("OrderBook.API", LogEventLevel.Debug);
+                loggerConfiguration.MinimumLevel.Override("OrderBook.Worker", LogEventLevel.Debug);
             }
 
             var elasticUrl = context.Configuration.GetValue<string>("ElasticConfiguration:Uri");
@@ -36,7 +37,9 @@ public static class Logging
                     AutoRegisterTemplate = true,
                     AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv8,
                     IndexFormat = "OrderBook-Logs-{0:yyyy.MM.dd}",
-                    MinimumLogEventLevel = LogEventLevel.Error,
+                    MinimumLogEventLevel = LogEventLevel.Verbose,
+                    //NumberOfReplicas = 1,
+                    //NumberOfShards = 1
                 });
             }
         };

@@ -5,6 +5,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
+      
     depends_on:
       - rabbitmq
       - elasticsearch
@@ -24,27 +25,30 @@ services:
   elasticsearch:
     container_name: elasticsearch
     environment:
-      # - cluster.initial_master_nodes=elasticsearch
+      - cluster.initial_master_nodes=elasticsearch
       # - xpack.monitoring.enabled=true
       # - xpack.watcher.enabled=false
-      # - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - xpack.security.enabled=false
-      - discovery.type=single-node
+      - cluster.name=es-docker-cluster
+      - node.name=elasticsearch
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      #- xpack.security.enabled=false
+      #- discovery.type=single-node
+      - bootstrap.memory_lock=true
     ulimits:
       memlock:
         soft: -1
         hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    cap_add: 
-      - IPC_LOCK
+    #   nofile:
+    #     soft: 65536
+    #     hard: 65536
+    # cap_add: 
+    #   - IPC_LOCK
     ports:
       - "9200:9200"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
-    # networks:
-    #   - challenge
+    networks:
+      - challenge
   
   mongodb:
     container_name: mongo
@@ -71,13 +75,15 @@ services:
   kibana:
     container_name: kibana
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     restart: always
     depends_on:
       - elasticsearch
     ports:
       - "5601:5601"
+    networks:
+      - challenge
   
   orderbook-worker:
     environment:

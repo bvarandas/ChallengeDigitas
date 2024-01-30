@@ -1,7 +1,9 @@
 using ChallengeCrf.Api.Hubs;
+using Common.Logging;
 using OrderBook.API.Configurations;
 using OrderBook.Application.Commands;
 using OrderBook.Application.Interfaces;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +20,10 @@ var config = new ConfigurationBuilder()
 //builder.Services.AddSwaggerGen();
 
 NativeInjectorBoostrapper.RegisterServices(builder.Services, config);
+builder.Host.UseSerilog(Logging.ConfigureLogger);
 
 var app = builder.Build();
-
+//app.
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -33,6 +36,7 @@ app.MapPost("api/orderbook/trade", async (OrderTradeCommand command, IOrderBookS
 {
     try
     {
+        //throw new Exception("Error de propósito");
         var resultTrade = await service.OrderTradeAsync(command);
         return Results.Accepted(null, resultTrade);
     }
