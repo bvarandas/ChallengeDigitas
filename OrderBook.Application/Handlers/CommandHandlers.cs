@@ -24,13 +24,13 @@ public class InsertOrderBookCommandHandler : IRequestHandler<InsertOrderBookComm
         var validation = command.Validation();
         if (!validation.IsValid)
         {
-            //validation.Errors.
+            return Result.Fail(validation.ToString("-"));
         }
 
         var orderBookToInsert = _mapper.Map<InsertOrderBookCommand, OrderBookRoot>(command);
-        await _orderBookRepository.CreateOrderBook(orderBookToInsert);
-        _logger.LogInformation($"Order Book {orderBookToInsert.Ticker}");
-        return await Task.FromResult(true);
+        await _orderBookRepository.CreateOrderBookAsync(orderBookToInsert);
+        _logger.LogInformation($"Order Book {orderBookToInsert?.Ticker}");
+        return Result.Ok(true);
     }
 }
 
@@ -51,13 +51,12 @@ public class InsertOrderTradeCommandHandler : IRequestHandler<InsertOrderTradeCo
 
         if (!validation.IsValid)
         {
-
+            return Result.Fail(validation.ToString("-"));
         }
         var orderBookToInsert = _mapper.Map<InsertOrderTradeCommand, OrderTrade>(command);
         //orderBookToInsert.Id = ObjectId.GenerateNewId().ToString();
         await _orderTradeRepository.CreateOrderTradeAsync(orderBookToInsert);
-
-        _logger.LogInformation($"Order Trade {orderBookToInsert.Ticker}");
-        return await Task.FromResult(true);
+        _logger.LogInformation($"Order Trade {orderBookToInsert?.Ticker}");
+        return Result.Ok(true);
     }
 }

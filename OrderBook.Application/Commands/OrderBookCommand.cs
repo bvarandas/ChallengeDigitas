@@ -19,16 +19,12 @@ public abstract class OrderBookCommand
 public class BookLevelCommand
 {
     public OrderBookSide Side { get; set; }
-
     public double Price { get; set; }
-
     public double Amount { get; set; }
-
     public long OrderId { get; set; }
 }
 public class InsertOrderBookCommand : OrderBookCommand, IRequest<Result<bool>> 
 {
-
     public InsertOrderBookCommand(string ticker, DateTime timestamp, DateTime microtimestamp, BookLevelCommand[] bids, BookLevelCommand[] asks)
     {
         Ticker = ticker;

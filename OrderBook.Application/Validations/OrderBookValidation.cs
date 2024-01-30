@@ -17,10 +17,11 @@ public abstract class OrderBookValidation<T> : AbstractValidator<T> where T : Or
             .WithMessage("É necessário inserir ao menos um Bid válido!");
     }
 
-    protected void ValidateBids()
+    protected void ValidateBidsLength()
     {
         RuleFor(c => c.Bids.Length)
             .NotEqual(0)
+            .When(r=>r.Bids is not null)
             .WithMessage("É necessário inserir ao menos um Bid válido!");
     }
 
@@ -35,6 +36,7 @@ public abstract class OrderBookValidation<T> : AbstractValidator<T> where T : Or
     {
         RuleFor(c => c.Asks.Length)
             .NotEqual(0)
+            .When(r => r.Asks is not null)
             .WithMessage("É necessário inserir ao menos um Asks válido!");
     }
 }
@@ -52,15 +54,13 @@ public abstract class OrderBookTradeValidation<T> : AbstractValidator<T> where T
         RuleFor(c => c.QuantityRequested)
             .NotEqual(0)
             .WithMessage("É necessário inserir um QuantityRequested válido!")
-            .LessThan(0)
+            .GreaterThan(0)
             .WithMessage("É necessário inserir um QuantityRequested positivo!");
     }
 
     protected void ValidateTradeSide()
     {
         RuleFor(c => c.TradeSide)
-            .Null()
-            .WithMessage("É necessário inserir ao menos um TradeSide válido!")
             .IsInEnum()
             .WithMessage("É necessário inserir ao menos um TradeSide válido!");
     }
@@ -78,9 +78,9 @@ public class InsertOrderBookCommandValidation : OrderBookValidation<InsertOrderB
     {
         ValidateTicker();
         ValidateBidsNull();
-        ValidateBids();
-        ValidateAsksNull();
-        ValidateAsksLength();
+        ValidateBidsLength();
+        //ValidateAsksNull();
+        //ValidateAsksLength();
     }
 }
 
@@ -90,12 +90,11 @@ public class UpdateOrderBookCommandValidation : OrderBookValidation<UpdateOrderB
     {
         ValidateTicker();
         ValidateBidsNull();
-        ValidateBids();
+        ValidateBidsLength();
         ValidateAsksNull();
         ValidateAsksLength();
     }
 }
-
 public class InsertOrderTradeCommandValidation : OrderBookTradeValidation<InsertOrderTradeCommand>
 {
     public InsertOrderTradeCommandValidation()

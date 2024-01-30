@@ -18,7 +18,7 @@ public class OrderBookRepository : IOrderBookRepository
         _logger = logger;
     }
 
-    public async Task<bool> CreateOrderBook(Core.AggregateObjects.OrderBookRoot orderBook)
+    public async Task<bool> CreateOrderBookAsync(Core.AggregateObjects.OrderBookRoot orderBook)
     {
         string ticker = orderBook.Ticker;
         var inserts = new List<WriteModel<OrderBookRoot>>();
@@ -40,7 +40,7 @@ public class OrderBookRepository : IOrderBookRepository
         return result;
     }
 
-    public async Task<IEnumerable<OrderBookRoot>> GetOrderBooks(OrderBookSpecParams specParams)
+    public async Task<IEnumerable<OrderBookRoot>> GetOrderBooksAsync(OrderBookSpecParams specParams)
     {
         var builder = Builders<OrderBookRoot>.Filter;
         var filter = builder.Empty;
@@ -53,7 +53,7 @@ public class OrderBookRepository : IOrderBookRepository
         return _context.OrderBooks.Find(filter).ToEnumerable();
     }
 
-    public async Task<bool> UpdateOrderBook(OrderBookRoot orderBook)
+    public async Task<bool> UpdateOrderBookAsync(OrderBookRoot orderBook)
     {
         string ticker = orderBook.Ticker;
         var updates = new List<WriteModel<OrderBookRoot>>();

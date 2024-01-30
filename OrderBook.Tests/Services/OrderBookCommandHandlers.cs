@@ -9,29 +9,37 @@ using FluentAssertions;
 using ProtoBuf.WellKnownTypes;
 using System.Reactive;
 using OrderBook.Core.Enumerations;
+using MongoDB.Bson;
 
 namespace OrderBook.Tests.Services;
-
+/*
+ <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+        <_Parameter1>OrderBook.Tests</Parameter1>
+    </AssemblyAttribute>
+ </ItemGroup>
+ */
 public class OrderBookCommandHandlers
 {
     private readonly Mock<IOrderBookRepository> _orderBookRepositoryMock;
-    private readonly Mock<ILogger<InsertOrderTradeCommandHandler>> _loggerUpdateTradeMock;
-    private readonly Mock<ILogger<InsertOrderBookCommandHandler>> _loggerInsertBookMock;
+    private readonly Mock<IOrderTradeRepository> _orderTradeRepositoryMock;
+    private readonly Mock<ILogger<InsertOrderTradeCommandHandler>> _loggerOrderTradeMock;
+    private readonly Mock<ILogger<InsertOrderBookCommandHandler>> _loggerOrderBookMock;
     private readonly Mock<IMapper> _mapper;
     private BookLevelCommand[] _bids;
     private BookLevelCommand[] _asks;
     public OrderBookCommandHandlers()
     {
+        _orderTradeRepositoryMock = new();
         _orderBookRepositoryMock = new();
-        _loggerUpdateTradeMock = new();
-        _loggerInsertBookMock = new();
+        _loggerOrderTradeMock = new();
+        _loggerOrderBookMock = new();
         _mapper = new();
         _bids = new BookLevelCommand[] { };
         _asks = new BookLevelCommand[] { };
     }
 
-
-#region Insert
+#region OrderBook
 
     [Fact]
     public async Task Handle_Should_ReturnFailureResult_When_Insert_OrderBookBidsAsksIsNull()
@@ -42,7 +50,7 @@ public class OrderBookCommandHandlers
 
         //_orderBookRepositoryMock.Setup(x=>x.)
 
-        var handler = new InsertOrderBookCommandHandler(_loggerInsertBookMock.Object, _orderBookRepositoryMock.Object, _mapper.Object);
+        var handler = new InsertOrderBookCommandHandler(_loggerOrderBookMock.Object, _orderBookRepositoryMock.Object, _mapper.Object);
         // Action
         Result<bool> result = await handler.Handle(command, default);
 
@@ -59,7 +67,7 @@ public class OrderBookCommandHandlers
 
         //_cashFlowRepositoryMock.Setup(x=>x.)
 
-        var handler = new InsertOrderBookCommandHandler(_loggerInsertBookMock.Object, _orderBookRepositoryMock.Object, _mapper.Object);
+        var handler = new InsertOrderBookCommandHandler(_loggerOrderBookMock.Object, _orderBookRepositoryMock.Object, _mapper.Object);
         // Action
         Result<bool> result = await handler.Handle(command, default);
 
@@ -77,7 +85,7 @@ public class OrderBookCommandHandlers
 
         //_cashFlowRepositoryMock.Setup(x=>x.)
 
-        var handler = new InsertOrderBookCommandHandler(_loggerInsertBookMock.Object, _orderBookRepositoryMock.Object, _mapper.Object);
+        var handler = new InsertOrderBookCommandHandler(_loggerOrderBookMock.Object, _orderBookRepositoryMock.Object, _mapper.Object);
         // Action
         Result<bool> result = await handler.Handle(command, default);
 
@@ -93,8 +101,8 @@ public class OrderBookCommandHandlers
 
         for (int i =0; i < 10; i++)
         {
-            bids.Add(new BookLevelCommand() { Amount = i + 0.1544, Price = i + 0.454, Side = OrderBookSide.Bid });
-            asks.Add(new BookLevelCommand() { Amount = i + 0.1544, Price = i + 0.454, Side = OrderBookSide.Ask });
+            bids.Add(new BookLevelCommand() { Amount = i + 0.1544, Price = i + 0.454, Side = OrderBookSide.Bid, OrderId=0 });
+            asks.Add(new BookLevelCommand() { Amount = i + 0.1544, Price = i + 0.454, Side = OrderBookSide.Ask, OrderId=0 });
         }
         _bids = bids.ToArray();
         _asks = asks.ToArray();
@@ -110,8 +118,11 @@ public class OrderBookCommandHandlers
         // Arrange
         var command = new InsertOrderBookCommand("btcusd", timestamp, timestamp, _bids, _asks);
 
-        //_orderBookRepositoryMock.Setup(x=>x.CreateOrderBook()
-        var handler = new InsertOrderBookCommandHandler(_loggerInsertBookMock.Object, _orderBookRepositoryMock.Object, _mapper.Object);
+        _orderBookRepositoryMock.Setup(
+            x => x.CreateOrderBookAsync(It.IsAny<Core.AggregateObjects.OrderBookRoot>()))
+            .ReturnsAsync(true);
+
+        var handler = new InsertOrderBookCommandHandler(_loggerOrderBookMock.Object, _orderBookRepositoryMock.Object, _mapper.Object);
 
         // Action
         Result<bool> result = await handler.Handle(command, default);
@@ -120,124 +131,93 @@ public class OrderBookCommandHandlers
         result.IsSuccess.Should().BeTrue();
     }
 
-    
     #endregion
 
-    //    #region Update
-    //    [Fact]
-    //    public async Task Handle_Should_ReturnFailureResult_When_Update_CashFlowIsNegative()
-    //    {
-    //        // Arrange
-    //        var command = new UpdateCashFlowCommand("6596e8430a28df8491b77420", "Teste de fluxo de caixa", -500.00, CashFlowEntry.Debit, DateTime.Now);
+    #region OrderTrade
+    IList<BookLevelCommand> _quotes = new List<BookLevelCommand>();
+    private async void UpdateQuotes()
+    {
+        _quotes.Clear();
+        for (int i = 0; i < 10; i++)
+            _quotes.Add(new BookLevelCommand() { Amount = i + 0.56, Price = i + 0.87, Side = OrderBookSide.Ask });
+    }
+    [Fact]
+    public async Task Handle_Should_ReturnFailureResult_When_Insert_OrderTradeIsNegative()
+    {
+        // Arrange
+        var id = ObjectId.GenerateNewId();
+        var command = new InsertOrderTradeCommand(id.ToString(), "btcusd", -100, TradeSide.Sell, null!,45,454  );
 
-    //        _cashFlowRepositoryMock.Setup(x => x.AddCashFlow(It.IsAny<CashFlow>()))
-    //            .ReturnsAsync(false);
+        //_orderTradeRepositoryMock.Setup(x =>x.CreateOrderTradeAsync( ))
+        //    .ReturnsAsync(false);
 
-    //        var handler = new CashFlowCommandHandler(_cashFlowRepositoryMock.Object, _unitOfWorkMock.Object, _mediatorHandlerMock.Object, _notifications, _loggerMock.Object);
-    //        // Action
-    //        Result<bool> result = await handler.Handle(command, default);
+        var handler = new InsertOrderTradeCommandHandler(_loggerOrderTradeMock.Object, _mapper.Object, _orderTradeRepositoryMock.Object);
+        // Action
+        Result<bool> result = await handler.Handle(command, default);
 
-    //        // Assert
-    //        result.IsFailed.Should().BeTrue();
+        // Assert
+        result.IsFailed.Should().BeTrue();
+    }
 
-    //    }
+    [Fact]
+    public async Task Handle_Should_ReturnFailureResult_When_Insert_OrderTrade_QuantityRequested_IsZero()
+    {
+        // Arrange
+        var id = ObjectId.GenerateNewId();
+        var command = new InsertOrderTradeCommand(id.ToString(), "btcusd", 0, TradeSide.Sell, null!, 45, 454);
 
-    //    [Fact]
-    //    public async Task Handle_Should_ReturnFailureResult_When_Update_CashFlowIsZero()
-    //    {
-    //        // Arrange
-    //        var command = new UpdateCashFlowCommand("6596e8430a28df8491b77420", "Teste de fluxo de caixa", 0, CashFlowEntry.Debit, DateTime.Now);
+        //_cashFlowRepositoryMock.Setup(x => x.AddCashFlow(It.IsAny<CashFlow>()))
+        //    .ReturnsAsync(false);
 
-    //        _cashFlowRepositoryMock.Setup(x => x.AddCashFlow(It.IsAny<CashFlow>()))
-    //            .ReturnsAsync(false);
+        var handler = new InsertOrderTradeCommandHandler(_loggerOrderTradeMock.Object, _mapper.Object, _orderTradeRepositoryMock.Object);
+        // Action
+        Result<bool> result = await handler.Handle(command, default);
 
-    //        var handler = new CashFlowCommandHandler(_cashFlowRepositoryMock.Object, _unitOfWorkMock.Object, _mediatorHandlerMock.Object, _notifications, _loggerMock.Object);
-    //        // Action
-    //        Result<bool> result = await handler.Handle(command, default);
+        // Assert
+        result.IsFailed.Should().BeTrue();
+        
+    }
 
-    //        // Assert
-    //        result.IsFailed.Should().BeTrue();
-    //        //result.Error.Should().Be(
-    //    }
+    [Fact]
+    public async Task Handle_Should_ReturnFailureResult_When_Insert_OrderTradeWithoutTicker()
+    {
+        // Arrange
+        var id = ObjectId.GenerateNewId();
+        var command = new InsertOrderTradeCommand(id.ToString(), "", 0, TradeSide.Sell, null!, 45, 454);
 
-    //    [Fact]
-    //    public async Task Handle_Should_ReturnFailureResult_When_Update_CashFlowWithoutDescription()
-    //    {
-    //        // Arrange
-    //        var command = new UpdateCashFlowCommand("6596e85952a677e5a9d1e039", string.Empty, 0, CashFlowEntry.Debit, DateTime.Now);
+        //_cashFlowRepositoryMock.Setup(x => x.AddCashFlow(It.IsAny<CashFlow>()))
+        //    .ReturnsAsync(false);
 
-    //        _cashFlowRepositoryMock.Setup(x => x.AddCashFlow(It.IsAny<CashFlow>()))
-    //            .ReturnsAsync(false);
+        var handler = new InsertOrderTradeCommandHandler(_loggerOrderTradeMock.Object, _mapper.Object, _orderTradeRepositoryMock.Object);
 
-    //        var handler = new CashFlowCommandHandler(_cashFlowRepositoryMock.Object, _unitOfWorkMock.Object, _mediatorHandlerMock.Object, _notifications, _loggerMock.Object);
-    //        // Action
-    //        Result<bool> result = await handler.Handle(command, default);
+        // Action
+        Result<bool> result = await handler.Handle(command, default);
 
-    //        // Assert
-    //        result.IsFailed.Should().BeTrue();
-    //        //result.Error.Should().Be(
-    //    }
-
-
-    //    [Fact]
-    //    public async Task Handle_Should_ReturnSuccessResult_When_Update_CashFlowIsPositivo()
-    //    {
-    //        // Arrange
-    //        var command = new UpdateCashFlowCommand("6596e85952a677e5a9d1e039", "Teste de fluxo de caixa", 500.00, CashFlowEntry.Debit, DateTime.Now);
-
-    //        _cashFlowRepositoryMock.Setup(x => x.AddCashFlow(It.IsAny<CashFlow>()))
-    //            .ReturnsAsync(true);
+        // Assert
+        result.IsFailed.Should().BeTrue();
+    }
 
 
-    //        var handler = new CashFlowCommandHandler(_cashFlowRepositoryMock.Object,
-    //            _unitOfWorkMock.Object,
-    //            _mediatorHandlerMock.Object,
-    //            _notifications,
-    //            _loggerMock.Object);
+    [Fact]
+    public async Task Handle_Should_ReturnSuccessResult_When_Insert_OrderTradeIsPositivo()
+    {
+        // Arrange
+        var id = ObjectId.GenerateNewId();
+        var command = new InsertOrderTradeCommand(id.ToString(), "btcusd", 10, TradeSide.Sell, null!, 45, 454);
 
-    //        // Action
-    //        Result<bool> result = await handler.Handle(command, default);
+        _orderTradeRepositoryMock.Setup(
+            x => x.CreateOrderTradeAsync(It.IsAny<OrderBook.Core.AggregateObjects.OrderTrade>()))
+            .ReturnsAsync(true);
 
-    //        // Assert
-    //        result.IsSuccess.Should().BeTrue();
-    //        //result.Errors.Should()..Be(true);
-    //        //result.Error.Should().Be(
-    //    }
+        var handler = new InsertOrderTradeCommandHandler(_loggerOrderTradeMock.Object, _mapper.Object, _orderTradeRepositoryMock.Object);
 
-    //    [Fact]
-    //    public async Task Handle_Should_ReturnSuccessResult_When_Update_CashFlowGreaterThenZero()
-    //    {
-    //        // Arrange
-    //        var command = new UpdateCashFlowCommand("6596e85952a677e5a9d1e039", "Teste de fluxo de caixa", 10, CashFlowEntry.Debit, DateTime.Now);
+        // Action
+        Result<bool> result = await handler.Handle(command, default);
 
-    //        _cashFlowRepositoryMock.Setup(x => x.AddCashFlow(It.IsAny<CashFlow>()))
-    //            .ReturnsAsync(true);
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+    }
 
-    //        var handler = new CashFlowCommandHandler(_cashFlowRepositoryMock.Object, _unitOfWorkMock.Object, _mediatorHandlerMock.Object, _notifications, _loggerMock.Object);
-    //        // Action
-    //        Result<bool> result = await handler.Handle(command, default);
 
-    //        // Assert
-    //        result.IsSuccess.Should().BeTrue();
-    //        //result.Error.Should().Be(
-    //    }
-
-    //    [Fact]
-    //    public async Task Handle_Should_ReturnSuccessResult_When_Update_CashFlowWithoutDescription()
-    //    {
-    //        // Arrange
-    //        var command = new UpdateCashFlowCommand("6596e85952a677e5a9d1e039", "Teste de fluxo de caixa", 0, CashFlowEntry.Debit, DateTime.Now);
-
-    //        _cashFlowRepositoryMock.Setup(x => x.AddCashFlow(It.IsAny<CashFlow>()))
-    //            .ReturnsAsync(true);
-
-    //        var handler = new CashFlowCommandHandler(_cashFlowRepositoryMock.Object, _unitOfWorkMock.Object, _mediatorHandlerMock.Object, _notifications, _loggerMock.Object);
-    //        // Action
-    //        Result<bool> result = await handler.Handle(command, default);
-
-    //        // Assert
-    //        result.IsSuccess.Should().BeTrue();
-
-    //    }
-    //    #endregion
+    #endregion
 }
