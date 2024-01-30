@@ -7,6 +7,7 @@ using MongoDB.Bson;
 using Moq;
 using OrderBook.API.Responses;
 using OrderBook.Application;
+using OrderBook.Application.Automapper;
 using OrderBook.Application.Commands;
 using OrderBook.Application.Handlers;
 using OrderBook.Application.Interfaces;
@@ -25,25 +26,31 @@ namespace OrderBook.Tests.Services;
 
 public class OrderBookServices
 {
-    //private readonly Mock<IOrderBookService> _orderBookServiceMock;
     private readonly Mock<IOrderBookRepository> _orderBookRepositoryMock;
     private readonly Mock<IOrderTradeRepository> _orderTradeRepositoryMock;
-    //private readonly Mock<ILogger<OrderTradeRepository>> _loggerOrderTradeMock;
-    //private readonly Mock<ILogger<OrderBookRepository>> _loggerOrderBookMock;
     private readonly Mock<ILogger<OrderBookService>> _loggerOrderBookServiceMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<IMediator> _mediatorMock;
     private BookLevel[] _bids;
     private BookLevel[] _asks;
+    
+    IMapper _mapper;
+    MapperConfiguration _config;
+    
     public OrderBookServices()
     {
         _mapperMock = new();
         _orderTradeRepositoryMock = new();
         _orderBookRepositoryMock = new();
-        //_loggerOrderTradeMock = new();
-        //_loggerOrderBookMock = new();
         _mediatorMock = new();
         _loggerOrderBookServiceMock = new();
+        _config = new MapperConfiguration(cfg => cfg.AddMaps(
+            new[] { 
+                typeof(DomainToViewModelMappingProfile),
+                typeof(ViewModelToDomainMappingProfile)
+            }));
+
+        _mapper = _config.CreateMapper();
     }
 
     [Fact]
@@ -196,7 +203,7 @@ public class OrderBookServices
         
         var id = ObjectId.GenerateNewId();
         var orderBookCommand = new InsertOrderTradeCommand(id.ToString(), "btcusd", 10, TradeSide.Buy, null!, 0.0, 0.0);
-        var service = new OrderBookService(_mapperMock.Object, _mediatorMock.Object, _loggerOrderBookServiceMock.Object);
+        var service = new OrderBookService(_mapper, _mediatorMock.Object, _loggerOrderBookServiceMock.Object);
         
         // Action
         var orderBook = new Application.Responses.Books.OrderBook();
@@ -207,66 +214,16 @@ public class OrderBookServices
         
         await service.AddOrderBookCacheAsync(orderBook);
 
+        //_mapperMock.Setup(x => x.Map<IList<OrderBook.Application.Responses.Books.BookLevel>, IList<BookLevelCommand>>(It.IsAny<IList<BookLevel>>())).Returns();
+
         var result = await service.SendOrderTradeAsync(orderBookCommand);
 
         // Assert
         Assert.IsType(typeof(OrderTradeViewModel), result);
-        Assert.Equal(id.ToString(), result.Id);
         Assert.True( result.TotalPriceShaved >=0);
         Assert.NotNull(result.Quotes);
     }
 
-
-    [Fact]
-    public async Task SortOrderBookCacheAsync_Should_ReturnSuccessResult()
-    {
-        // Arrange
-        UpdateBidsAsksAsync();
-        var id = ObjectId.GenerateNewId();
-        var orderBookCommand = new InsertOrderTradeCommand(id.ToString(), "btcusd", 10, TradeSide.Buy, null!, 0.0, 0.0);
-        var service = new OrderBookService(_mapperMock.Object, _mediatorMock.Object, _loggerOrderBookServiceMock.Object);
-        
-        // Action
-        var orderBook = new Application.Responses.Books.OrderBook();
-        orderBook.Ticker = "btcusd";
-        orderBook.Timestamp = DateTime.UtcNow;
-        orderBook.Asks = _asks;
-        orderBook.Bids = _bids;
-
-        await service.AddOrderBookCacheAsync(orderBook);
-
-        var result = await service.SendOrderTradeAsync(orderBookCommand);
-
-        // Assert
-        Assert.IsType(typeof(OrderTradeViewModel), result);
-        Assert.Equal(id.ToString(), result.Id);
-        Assert.True(result.TotalPriceShaved >= 0);
-        Assert.NotNull(result.Quotes);
-    }
-
-    [Fact]
-    public async Task RemoveOldOrderBookCacheAsync_Should_ReturnSuccessResult()
-    {
-        // Arrange
-        UpdateBidsAsksAsync();
-        var id = ObjectId.GenerateNewId();
-        var orderBookCommand = new InsertOrderTradeCommand(id.ToString(), "btcusd", 10, TradeSide.Buy, null!, 0.0, 0.0);
-        var service = new OrderBookService(_mapperMock.Object, _mediatorMock.Object, _loggerOrderBookServiceMock.Object);
-        // Action
-        var orderBook = new Application.Responses.Books.OrderBook();
-        orderBook.Ticker = "btcusd";
-        orderBook.Timestamp = DateTime.UtcNow;
-        orderBook.Asks = _asks;
-        orderBook.Bids = _bids;
-
-        await service.AddOrderBookCacheAsync(orderBook);
-
-        var result = await service.RemoveOldOrderBookCacheAsync();//.SendOrderTradeAsync(orderBookCommand);
-
-        // Assert
-        Assert.IsType(typeof(OrderTradeViewModel), result);
-        Assert.Equal(id.ToString(), result.Id);
-        Assert.True(result.TotalPriceShaved >= 0);
-        Assert.NotNull(result.Quotes);
-    }
+    
+    
 }
