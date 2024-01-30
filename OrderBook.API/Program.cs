@@ -37,7 +37,7 @@ app.MapPost("api/orderbook/trade", async (OrderTradeCommand command, IOrderBookS
     try
     {
         //throw new Exception("Error de propósito");
-        var resultTrade = await service.OrderTradeAsync(command);
+        var resultTrade = await service.SendOrderTradeAsync(command);
         return Results.Accepted(null, resultTrade);
     }
     catch (Exception ex)

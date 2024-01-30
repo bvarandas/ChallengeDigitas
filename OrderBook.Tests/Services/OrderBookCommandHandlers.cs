@@ -7,7 +7,6 @@ using OrderBook.Application.Commands;
 using AutoMapper;
 using FluentAssertions;
 using ProtoBuf.WellKnownTypes;
-using System.Reactive;
 using OrderBook.Core.Enumerations;
 using MongoDB.Bson;
 
@@ -46,7 +45,7 @@ public class OrderBookCommandHandlers
     {
         var timestamp = DateTime.Now;
         // Arrange
-        var command = new InsertOrderBookCommand("btcusd", timestamp, timestamp,null, null);
+        var command = new InsertOrderBookCommand("btcusd", timestamp, timestamp,null!, null!);
 
         //_orderBookRepositoryMock.Setup(x=>x.)
 

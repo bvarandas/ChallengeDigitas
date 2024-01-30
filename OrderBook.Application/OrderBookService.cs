@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentResults;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -94,22 +95,23 @@ public class OrderBookService : IOrderBookService
             {
                 var now = DateTime.Now;
 
-                var book= _dicOrderBook[orderBook.Ticker];
-
-                var listAsk = book.Asks.ToList();
-                var listBids = book.Bids.ToList();
-                orderBook.Asks.ToList().ForEach(x =>
+                if (_dicOrderBook.TryGetValue(orderBook.Ticker, out Responses.Books.OrderBook book))
                 {
-                    x.Timestamp = now;
-                    listAsk.Add(x);
-                });
-                orderBook.Bids.ToList().ForEach(x =>
-                {
-                    x.Timestamp = now;
-                    listBids.Add(x);
-                });
-                book.Asks = listAsk.ToArray();
-                book.Bids = listBids.ToArray();
+                    var listAsk = book.Asks.ToList();
+                    var listBids = book.Bids.ToList();
+                    orderBook.Asks.ToList().ForEach(x =>
+                    {
+                        x.Timestamp = now;
+                        listAsk.Add(x);
+                    });
+                    orderBook.Bids.ToList().ForEach(x =>
+                    {
+                        x.Timestamp = now;
+                        listBids.Add(x);
+                    });
+                    book.Asks = listAsk.ToArray();
+                    book.Bids = listBids.ToArray();
+                }
             }
             //_semaphore.Wait();
             //_semaphore.Release();
@@ -184,31 +186,31 @@ public class OrderBookService : IOrderBookService
         return _dicOrderBookData[ticker]; 
     }
     
-    public async Task AddOrderBookCacheAsync(Application.Responses.Books.OrderBook orderBook)
+    public async Task<Result<bool>> AddOrderBookCacheAsync(Application.Responses.Books.OrderBook orderBook)
     {
+        if (orderBook is null && !string.IsNullOrEmpty(orderBook.Ticker))
+            return Result.Fail("O objeto nem o Ticker não pode ser nulo");
+
+        if (orderBook?.Bids is null || orderBook?.Asks is null)
+            return Result.Fail("O Bids or aks não podem ser nulos");
+
         if (!_dicOrderBook.TryGetValue(orderBook.Ticker, out Responses.Books.OrderBook book))
         {
             _dicOrderBook.TryAdd(orderBook.Ticker, orderBook);
             _dicOrderBookData.TryAdd(orderBook.Ticker, new OrderBookDataViewModel());
         }
         _queueOrderBook.Enqueue(orderBook);
+        return Result.Ok(true);
     }
 
-    public Task<OrderBookViewModel> GetCashOrderBookIDAsync(string orderBookId)
+    public async Task<OrderTradeViewModel> SendOrderTradeAsync(OrderTradeCommand command)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<IAsyncEnumerable<OrderBookViewModel>> GetListAllAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<OrderTradeViewModel> OrderTradeAsync(OrderTradeCommand command)
-    {
-        OrderTradeViewModel resultObject = null!;
+        var resultObject = new OrderTradeViewModel();
         try
         {
+            if (command.QuantityRequested <= 0)
+                throw new Exception("Quantidade não pode ser 0 ou menor que zero");
+
             var quotations = command.TradeSide == Core.Enumerations.TradeSide.Buy ?
                 GetQuotesAskAsync(command.Ticker, command.QuantityRequested) :
                 GetQuotesBidAsync(command.Ticker, command.QuantityRequested);
