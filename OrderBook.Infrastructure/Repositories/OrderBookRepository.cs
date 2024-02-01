@@ -5,6 +5,7 @@ using OrderBook.Core.Specs;
 using OrderBook.Infrastructure.Data;
 using Microsoft.Extensions.Logging;
 using OrderBook.Core.AggregateObjects;
+using System.ComponentModel;
 
 namespace OrderBook.Infrastructure.Repositories;
 
@@ -20,18 +21,23 @@ public class OrderBookRepository : IOrderBookRepository
 
     public async Task<bool> CreateOrderBookAsync(Core.AggregateObjects.OrderBookRoot orderBook)
     {
-        string ticker = orderBook.Ticker;
-        var inserts = new List<WriteModel<OrderBookRoot>>();
-        var filterBuilder = Builders<OrderBookRoot>.Filter;
         bool result = false;
-        var filter = filterBuilder.Where(x => x.Ticker == ticker);
+        
         try
         {
+            if (orderBook is null)
+                throw new ArgumentNullException();
+            
+            var inserts = new List<WriteModel<OrderBookRoot>>();
+
             inserts.Add(new InsertOneModel<OrderBookRoot>(orderBook));
 
             var insertResult = await _context.OrderBooks.BulkWriteAsync(inserts);
             result = insertResult.IsAcknowledged && insertResult.ModifiedCount > 0;
             
+        }catch(ArgumentNullException ex)
+        {
+            _logger.LogError(ex.Message, ex);
         }
         catch(Exception ex)
         {

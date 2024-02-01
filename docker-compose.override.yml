@@ -13,6 +13,16 @@ services:
       - "5200:80"
     networks:
       - challenge
+  
+  sonarqube:
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - "9000:9000"
+    networks:
+      - challenge
 
   ocelot-apigateway:
     environment:
@@ -99,6 +109,9 @@ services:
   
   
 volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
   mongo_data:
   elasticsearch-data:
     driver: local

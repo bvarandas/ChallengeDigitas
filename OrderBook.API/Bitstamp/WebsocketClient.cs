@@ -34,7 +34,7 @@ public class WebsocketClient : IDisposable
             bool handled;
             var messageSafe = (message.Text ?? string.Empty).Trim();
 
-            if (messageSafe.StartsWith("{"))
+            if (messageSafe.StartsWith('{'))
             {
                 handled = HandleObjectMessage(messageSafe);
                 if (handled) return;

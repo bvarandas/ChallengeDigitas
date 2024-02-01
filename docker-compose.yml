@@ -7,6 +7,9 @@ services:
       context: .
       dockerfile: OrderBook.Api/Dockerfile
   
+  sonarqube:
+    image: sonarqube:community
+
   mongodb:
     image: mongo
   

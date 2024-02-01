@@ -1,0 +1,10 @@
+﻿C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Tests\GlobalUsings.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Tests\Services\OrderBookCommandHandlers.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Tests\Services\OrderBookRepository.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Tests\Services\OrderBookServices.cs
+C:\Users\bvarandas\.nuget\packages\microsoft.net.test.sdk\17.7.1\build\netcoreapp3.1\Microsoft.NET.Test.Sdk.Program.cs
+C:\Users\bvarandas\.nuget\packages\microsoft.testplatform.testhost\17.7.1\build\netcoreapp3.1\x64\testhost.exe
+C:\Users\bvarandas\.nuget\packages\microsoft.testplatform.testhost\17.7.1\build\netcoreapp3.1\x64\testhost.dll
+C:\Users\bvarandas\.nuget\packages\xunit.runner.visualstudio\2.4.5\build\netcoreapp3.1\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+C:\Users\bvarandas\.nuget\packages\xunit.runner.visualstudio\2.4.5\build\netcoreapp3.1\xunit.runner.reporters.netcoreapp10.dll
+C:\Users\bvarandas\.nuget\packages\xunit.runner.visualstudio\2.4.5\build\netcoreapp3.1\xunit.runner.utility.netcoreapp10.dll

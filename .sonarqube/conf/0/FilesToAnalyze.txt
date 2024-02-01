@@ -1,0 +1,3 @@
+﻿C:\Users\bvarandas\source\repos\ChallengeDigitas\docker-compose.override.yml
+C:\Users\bvarandas\source\repos\ChallengeDigitas\docker-compose.yml
+C:\Users\bvarandas\source\repos\ChallengeDigitas\.dockerignore

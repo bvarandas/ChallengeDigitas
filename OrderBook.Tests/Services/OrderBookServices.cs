@@ -5,22 +5,13 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using Moq;
-using OrderBook.API.Responses;
 using OrderBook.Application;
 using OrderBook.Application.Automapper;
 using OrderBook.Application.Commands;
-using OrderBook.Application.Handlers;
-using OrderBook.Application.Interfaces;
 using OrderBook.Application.Responses.Books;
 using OrderBook.Application.ViewModel;
 using OrderBook.Core.Enumerations;
 using OrderBook.Core.Repositories;
-using OrderBook.Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderBook.Tests.Services;
 
@@ -224,6 +215,5 @@ public class OrderBookServices
         Assert.NotNull(result.Quotes);
     }
 
-    
     
 }

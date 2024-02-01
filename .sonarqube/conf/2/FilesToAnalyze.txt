@@ -1,0 +1,5 @@
+﻿C:\Users\bvarandas\source\repos\ChallengeDigitas\Common.Logging\Correlation\AppBuilderExtensions.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Common.Logging\Correlation\CorrelationIdGenerator.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Common.Logging\Correlation\CorrelationIdMiddleware.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Common.Logging\Correlation\ICorrelationIdGenerator.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Common.Logging\Logging.cs

@@ -1,0 +1,8 @@
+﻿C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Worker\Program.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Worker\Workers\WorkerCosumer.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Worker\appsettings.Development.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Worker\appsettings.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Worker\Dockerfile
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Worker\Dockerfile.original
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Worker\Properties\launchSettings.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\.dockerignore

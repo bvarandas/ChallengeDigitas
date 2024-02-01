@@ -1,0 +1,16 @@
+﻿C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\Program.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\obj\Debug\net7.0\Ocelot.ApiGateway.GlobalUsings.g.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\obj\Debug\net7.0\.NETCoreApp,Version=v7.0.AssemblyAttributes.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\obj\Debug\net7.0\Ocelot.ApiGateway.AssemblyInfo.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\obj\Debug\net7.0\Ocelot.ApiGateway.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\appsettings.Development.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\appsettings.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\ocelot.Development.Development.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\ocelot.Development.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\ocelot.k8s.Development.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\ocelot.k8s.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\ocelot.Local.Development.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\ocelot.Local.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\Dockerfile
+C:\Users\bvarandas\source\repos\ChallengeDigitas\Ocelot.ApiGateway\Properties\launchSettings.json
+C:\Users\bvarandas\source\repos\ChallengeDigitas\.dockerignore

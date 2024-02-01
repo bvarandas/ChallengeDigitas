@@ -18,13 +18,12 @@ public class OrderTradeRepository : IOrderTradeRepository
     }
     public async Task<bool> CreateOrderTradeAsync(OrderTrade orderTrade)
     {
-        string ticker = orderTrade.Ticker;
-        var inserts = new List<WriteModel<OrderTrade>>();
-        var filterBuilder = Builders<OrderTrade>.Filter;
         bool result = false;
-        var filter = filterBuilder.Where(x => x.Ticker == ticker);
         try
         {
+            string ticker = orderTrade.Ticker;
+            var inserts = new List<WriteModel<OrderTrade>>();
+
             inserts.Add(new InsertOneModel<OrderTrade>(orderTrade));
 
             var insertResult = await _context.OrderTrade.BulkWriteAsync(inserts);

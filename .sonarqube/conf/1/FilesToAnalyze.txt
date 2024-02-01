@@ -1,0 +1,13 @@
+﻿C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\AggregateObjects\OrderBook.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\AggregateObjects\OrderTrade.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Entities\BaseEntity.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Entities\BookLevel.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Enums.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Extensions\DomainToViewModelExtensions.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Extensions\ProtoBufExtensions.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Extensions\ViewModelToDomainExtensions.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Repositories\IOderBookRepository.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Repositories\IOrderBookRepository.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Specs\OrderBookSpecParams.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\Specs\QueueSettings.cs
+C:\Users\bvarandas\source\repos\ChallengeDigitas\OrderBook.Core\ValuesObject\Currency.cs

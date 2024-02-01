@@ -6,7 +6,7 @@ namespace OrderBook.Infrastructure.Data;
 
 public class OrderBookContext : IOrderBookContext
 {
-    public IMongoCollection<Core.AggregateObjects.OrderBookRoot> OrderBooks { get; }
+    public IMongoCollection<Core.AggregateObjects.OrderBookRoot> OrderBooks { get; set; }
 
     public OrderBookContext (IConfiguration configuration )
     {
