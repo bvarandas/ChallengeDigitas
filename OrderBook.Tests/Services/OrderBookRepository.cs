@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using OrderBook.Core.Enumerations;
 using OrderBook.Core.Entities;
+using OrderBook.Core.Specs;
+using AutoFixture;
 
 namespace OrderBook.Tests.Services;
 
@@ -141,6 +143,70 @@ public class OrderBookRepository
         Assert.True(orderBook);
     }
 
+    [Fact]
+    private async Task UpdateOrderBookAsync_Should_ReturnFalseResult_When_Insert_OrderBook_IsNull()
+    {
+        // Arrange
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(myConfiguration)
+            .Build();
+        var orderBookContext = new OrderBookContext(configuration);
+        IEnumerable<WriteModel<OrderBookRoot>> list = new List<WriteModel<OrderBookRoot>>();
+
+
+        _orderBookContextMock
+            .Setup(x => x.OrderBooks.BulkWriteAsync(list, default, default))
+            .ReturnsAsync(It.IsAny<BulkWriteResult<OrderBookRoot>>);
+
+        // Action
+        var orderBookRepository = new Infrastructure.Repositories
+            .OrderBookRepository(_orderBookContextMock.Object, _loggerOrderBookMock.Object);
+
+        var orderBook = orderBookRepository.UpdateOrderBookAsync(It.IsAny<OrderBookRoot>()).Result;
+
+        //Assert  
+        Assert.NotNull(orderBook);
+        Assert.IsAssignableFrom<bool>(orderBook);
+    }
+    [Fact]
+    private async Task UpdateOrderBookAsync_Should_ReturnTrueResult_When_Insert_OrderBook_OK()
+    {
+        // Arrange
+        var orderBookRoot = new OrderBookRoot("btcusd", DateTime.Now, DateTime.Now, _bids, _asks);
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(myConfiguration)
+            .Build();
+
+        var list = new List<WriteModel<OrderBookRoot>>();
+        list.Add(new InsertOneModel<OrderBookRoot>(orderBookRoot));
+
+        var returnBulkResponse = (BulkWriteResult<OrderBookRoot>)new BulkWriteResult<OrderBookRoot>.Acknowledged(10, 0, 0, 10,
+                10, new List<WriteModel<OrderBookRoot>>(), new List<BulkWriteUpsert>());
+
+        var mockCollection = new Mock<IMongoCollection<OrderBookRoot>>();
+
+        mockCollection.Setup(s
+                    => s.BulkWriteAsync(It.IsAny<IEnumerable<WriteModel<OrderBookRoot>>>(), null,
+                        new CancellationToken()))
+                .Returns(Task.FromResult(returnBulkResponse));
+
+        _orderBookContextMock
+            .Setup(x => x.OrderBooks)
+            .Returns(mockCollection.Object);
+
+        // Action
+        var orderBookRepository = new Infrastructure.Repositories
+            .OrderBookRepository(_orderBookContextMock.Object, _loggerOrderBookMock.Object);
+
+        var orderBook = orderBookRepository.UpdateOrderBookAsync(orderBookRoot).Result;
+
+        //Assert  
+        Assert.NotNull(orderBook);
+        Assert.IsAssignableFrom<bool>(orderBook);
+        Assert.True(orderBook);
+    }
+
 
     [Fact]
     private async Task CreateOrderTradeAsync_Should_ReturnFalseResult_When_Insert_OrderBook_IsNull()
@@ -208,4 +274,74 @@ public class OrderBookRepository
         Assert.IsAssignableFrom<bool>(orderBook);
         Assert.True(orderBook);
     }
+
+    [Fact]
+    private async Task GetOrderBooksAsync_Should_ReturnFalseResult_When_Insert_OrderBook_IsNull()
+    {
+        // Arrange
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(myConfiguration)
+            .Build();
+        var orderBookContext = new OrderBookContext(configuration);
+        IEnumerable<WriteModel<OrderBookRoot>> list = new List<WriteModel<OrderBookRoot>>();
+
+
+        _orderBookContextMock
+            .Setup(x => x.OrderBooks.BulkWriteAsync(list, default, default))
+            .ReturnsAsync(It.IsAny<BulkWriteResult<OrderBookRoot>>);
+
+        // Action
+        var orderBookRepository = new Infrastructure.Repositories
+            .OrderBookRepository(_orderBookContextMock.Object, _loggerOrderBookMock.Object);
+
+        var orderBook = orderBookRepository.GetOrderBooksAsync(It.IsAny<OrderBookSpecParams>()).Result;
+
+        //Assert  
+        Assert.Null(orderBook);
+        //Assert.IsAssignableFrom<bool>(orderBook);
+    }
+    [Fact]
+    private async Task GetOrderBooksAsync_Should_ReturnTrueResult_When_Insert_OrderBook_OK()
+    {
+        // Arrange
+        var orderBookRoot = new OrderBookRoot("btcusd", DateTime.Now, DateTime.Now, _bids, _asks);
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(myConfiguration)
+            .Build();
+
+        //var expectResult = Fixture
+
+        var specParams = new OrderBookSpecParams();
+        specParams.Search = "{Id:fasf}";
+        var mockCollection = new Mock<IMongoCollection<OrderBookRoot>>();
+
+        var asyncCursor = new Mock<IAsyncCursor<OrderBookRoot>>();
+
+        asyncCursor.Setup(x => x.MoveNext(default)).Returns(true);
+        //asyncCursor.SetupGet(x => x.Current).Returns();
+
+        mockCollection.Setup(s =>
+                   s.FindSync(
+                       Builders<OrderBookRoot>.Filter.Empty, 
+                       It.IsAny<FindOptions<OrderBookRoot>>(), 
+                       default))
+                .Returns(asyncCursor.Object);
+
+        _orderBookContextMock
+            .Setup(x => x.OrderBooks)
+            .Returns(mockCollection.Object);
+
+        // Action
+        var orderBookRepository = new Infrastructure.Repositories
+            .OrderBookRepository(_orderBookContextMock.Object, _loggerOrderBookMock.Object);
+
+        var orderBook = orderBookRepository.GetOrderBooksAsync(specParams).Result;
+
+        //Assert  
+        Assert.NotNull(orderBook);
+        //Assert.IsAssignableFrom<bool>(orderBook);
+        //Assert.RaisesAny(orderBook.ToList().Any());
+    }
+
 }

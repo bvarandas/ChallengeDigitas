@@ -6,6 +6,7 @@ using OrderBook.Infrastructure.Data;
 using Microsoft.Extensions.Logging;
 using OrderBook.Core.AggregateObjects;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace OrderBook.Infrastructure.Repositories;
 
@@ -48,28 +49,63 @@ public class OrderBookRepository : IOrderBookRepository
 
     public async Task<IEnumerable<OrderBookRoot>> GetOrderBooksAsync(OrderBookSpecParams specParams)
     {
-        var builder = Builders<OrderBookRoot>.Filter;
-        var filter = builder.Empty;
+        IEnumerable<OrderBookRoot> result = null!;
 
-        if (!string.IsNullOrEmpty(specParams.Search))
+        try
         {
-            var searchFilter = builder.Regex(x => x.Ticker, new BsonRegularExpression(specParams.Search));
-            filter &= searchFilter;
+            if (specParams is null || string.IsNullOrEmpty(specParams.Search))
+                throw new ArgumentNullException();
+
+            var builder = Builders<OrderBookRoot>.Filter;
+            var filter = builder.Empty;
+
+            if (!string.IsNullOrEmpty(specParams.Search))
+            {
+                var searchFilter = builder.Regex(x => x.Ticker, new BsonRegularExpression(specParams.Search));
+                filter &= searchFilter;
+            }
+
+            result =  _context.OrderBooks.Find(filter).ToEnumerable();
         }
-        return _context.OrderBooks.Find(filter).ToEnumerable();
+        catch (ArgumentNullException ex)
+        {
+            _logger.LogError(ex.Message, ex);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message, ex);
+        }
+
+        return result;
     }
 
     public async Task<bool> UpdateOrderBookAsync(OrderBookRoot orderBook)
     {
-        string ticker = orderBook.Ticker;
-        var updates = new List<WriteModel<OrderBookRoot>>();
-        var filterBuilder = Builders<OrderBookRoot>.Filter;
+        bool result = false;
+        try
+        {
+            if (orderBook is null)
+                throw new ArgumentNullException();
 
-        var filter = filterBuilder.Where(x => x.Ticker == ticker);
-        updates.Add(new ReplaceOneModel<OrderBookRoot>(filter, orderBook));
+            string ticker = orderBook.Ticker;
 
-        var updateResult = await _context.OrderBooks.BulkWriteAsync(updates);
+            var updates = new List<WriteModel<OrderBookRoot>>();
+            var filterBuilder = Builders<OrderBookRoot>.Filter;
 
-        return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
+            var filter = filterBuilder.Where(x => x.Ticker == ticker);
+            updates.Add(new ReplaceOneModel<OrderBookRoot>(filter, orderBook));
+
+            var updateResult = await _context.OrderBooks.BulkWriteAsync(updates);
+            result = updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
+        }
+        catch (ArgumentNullException ex)
+        {
+            _logger.LogError(ex.Message, ex);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message, ex);
+        }
+        return result;
     }
 }
