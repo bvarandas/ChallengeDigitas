@@ -1,3 +1,4 @@
+![image](https://github.com/bvarandas/ChallengeDigitas/assets/13907905/cc8e3b5d-fc5b-4e6f-89cb-6c5123f3d74b)
 
 Projeto de desafio porposto para teste.
 
