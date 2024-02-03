@@ -51,3 +51,5 @@ app.UseCors("CorsPolicy");
 app.MapHub<BrokerHub>("/hubs/brokerhub");
 
 app.Run();
+
+public partial class Program { }

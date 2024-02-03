@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common.Logging\Common.Logging.csproj" />
     <ProjectReference Include="..\OrderBook.Application\OrderBook.Application.csproj" />
+    <InternalsVisibleTo Include="OrderBook.Tests"/>
   </ItemGroup>
 
 </Project>
