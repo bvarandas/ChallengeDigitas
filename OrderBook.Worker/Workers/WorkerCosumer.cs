@@ -59,6 +59,11 @@ public class WorkerConsumer : BackgroundService, IWorkerConsumer
         }
     }
 
+    public override async Task StopAsync(CancellationToken stoppingToken)
+    {
+        _channel.Close();
+    }
+
     private async void ConsumerOrderBook_Received(object? sender, BasicDeliverEventArgs e)
     {
         try
