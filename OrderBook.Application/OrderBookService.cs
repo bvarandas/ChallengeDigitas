@@ -50,40 +50,27 @@ public class OrderBookService : IOrderBookService
 
     }
 
-    private async Task<(IList<BookLevel>, double)> GetQuotesBidAsync(string ticker,double quantityRequest)
+    private async Task<(List<BookLevel>, double)> GetQuotesBidAsync(string ticker,double quantityRequest)
     {
         var result = (new List<BookLevel>(), 0.0);
-        double quantityCollected = 0.0;
+
         if (_dicOrderBook.TryGetValue(ticker, out Responses.Books.OrderBook orderBook))
         {
-            Array.ForEach(orderBook.Bids, bid => { 
-                if (quantityRequest > quantityCollected && (quantityCollected + bid.Amount) < quantityRequest)
-                {
-                    quantityCollected += bid.Amount;
-                    result.Item1.Add(bid);
-                }
-            });
-            result.Item2 = quantityCollected;
+            result = orderBook.GetQuotesBidAsync(quantityRequest);
         }
 
         return result;
     }
 
-    private async Task<(IList<BookLevel>, double)> GetQuotesAskAsync(string ticker,double quantityRequest)
+    private async Task<(List<BookLevel>, double)> GetQuotesAskAsync(string ticker,double quantityRequest)
     {
         var result = (new List<BookLevel>(), 0.0);
-        double AmountCollected = 0.0;
+        
         if (_dicOrderBook.TryGetValue(ticker, out Responses.Books.OrderBook orderBook))
         {
-            Array.ForEach(orderBook.Asks, ask => {
-                if (quantityRequest > AmountCollected && (AmountCollected + ask.Amount) < quantityRequest)
-                {
-                    AmountCollected += ask.Amount;
-                    result.Item1.Add(ask);
-                }
-            });
+            result = orderBook.GetQuotesAskAsync(quantityRequest);
         }
-        result.Item2 = AmountCollected;
+        
         return result;
     }
 
@@ -97,24 +84,9 @@ public class OrderBookService : IOrderBookService
 
                 if (_dicOrderBook.TryGetValue(orderBook.Ticker, out Responses.Books.OrderBook book))
                 {
-                    var listAsk = book.Asks.ToList();
-                    var listBids = book.Bids.ToList();
-                    orderBook.Asks.ToList().ForEach(x =>
-                    {
-                        x.Timestamp = now;
-                        listAsk.Add(x);
-                    });
-                    orderBook.Bids.ToList().ForEach(x =>
-                    {
-                        x.Timestamp = now;
-                        listBids.Add(x);
-                    });
-                    book.Asks = listAsk.ToArray();
-                    book.Bids = listBids.ToArray();
+                    await book.AddOrderBookCacheAsync(orderBook);
                 }
             }
-            //_semaphore.Wait();
-            //_semaphore.Release();
             
             Thread.Sleep(100);
         }
@@ -147,26 +119,18 @@ public class OrderBookService : IOrderBookService
         foreach (KeyValuePair<string, OrderBookDataViewModel> kvp in _dicOrderBookData)
         {
             var orderBook       = _dicOrderBook[kvp.Key];
-            if (orderBook.Bids.Length == 0 || orderBook.Asks.Length == 0) continue;
-            kvp.Value.Ticker    = orderBook.Ticker;
-            kvp.Value.MinPrice  = orderBook.Bids.FirstOrDefault().Price;
-            kvp.Value.MaxPrice  = orderBook.Asks.FirstOrDefault().Price;
             
-            var average         = (orderBook.Asks.Take(100).Average(x => x.Price) + orderBook.Bids.Take(100).Average(x => x.Price))/2;
-            var average5Seconds = (orderBook.Asks.Average(x => x.Price) + orderBook.Bids.Average(x => x.Price)) / 2;
-            var averageQuantity  = (orderBook.Asks.Average(x => x.Amount) + orderBook.Bids.Average(x => x.Amount)) / 2;
-
-            kvp.Value.AveragePrice              = average;
-            kvp.Value.AveragePriceLast5Seconds  = average5Seconds;
-            kvp.Value.AverageAmountQuantity     = averageQuantity;
+            if (orderBook.Bids.Length == 0 || orderBook.Asks.Length == 0) 
+                continue;
+            
+            await kvp.Value.UpdateOrderBookDataCacheAsync(orderBook);
         }
     }
     private async Task SortOrderBookCacheAsync()
     {
         foreach (KeyValuePair<string, Responses.Books.OrderBook> kvp in _dicOrderBook)
         {
-            Array.Sort(kvp.Value.Asks, new AsksComparer());
-            Array.Sort(kvp.Value.Bids, new BidsComparer());
+            await kvp.Value.SortOrderBookCacheAsync();
         }
     }
     private async Task RemoveOldOrderBookCacheAsync()
@@ -174,11 +138,7 @@ public class OrderBookService : IOrderBookService
         var now = DateTime.Now;
         foreach (KeyValuePair<string, Responses.Books.OrderBook> kvp in _dicOrderBook)
         {
-            var asksToRemove = Array.FindAll( kvp.Value.Asks, x => x.Timestamp < now.AddSeconds(-5));
-            var bidsToRemove = Array.FindAll(kvp.Value.Bids, x => x.Timestamp < now.AddSeconds(-5));
-
-            kvp.Value.Asks = kvp.Value.Asks.Except(asksToRemove).ToArray();
-            kvp.Value.Bids = kvp.Value.Bids.Except(bidsToRemove).ToArray();
+            await kvp.Value.RemoveOldOrderBookCacheAsync();
         }
     }
     public async Task<OrderBookDataViewModel> GetOrderBookDataCacheAsync(string ticker)

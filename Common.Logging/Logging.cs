@@ -37,7 +37,7 @@ public static class Logging
                     AutoRegisterTemplate = true,
                     AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv8,
                     IndexFormat = "OrderBook-Logs-{0:yyyy.MM.dd}",
-                    MinimumLogEventLevel = LogEventLevel.Information | LogEventLevel.Error,
+                    MinimumLogEventLevel = LogEventLevel.Information,
                     //NumberOfReplicas = 1,
                     //NumberOfShards = 1
                 });

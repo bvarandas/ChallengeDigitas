@@ -32,4 +32,19 @@ public class OrderBookDataViewModel
     public double AveragePrice { get; set; }
     public double AveragePriceLast5Seconds { get; set; }
     public double AverageAmountQuantity { get; set; }
+
+    public async Task UpdateOrderBookDataCacheAsync(Responses.Books.OrderBook orderBook)
+    {
+        Ticker = orderBook.Ticker;
+        MinPrice = orderBook.Bids.FirstOrDefault().Price;
+        MaxPrice = orderBook.Asks.FirstOrDefault().Price;
+
+        var average = (orderBook.Asks.Take(100).Average(x => x.Price) + orderBook.Bids.Take(100).Average(x => x.Price)) / 2;
+        var average5Seconds = (orderBook.Asks.Average(x => x.Price) + orderBook.Bids.Average(x => x.Price)) / 2;
+        var averageQuantity = (orderBook.Asks.Average(x => x.Amount) + orderBook.Bids.Average(x => x.Amount)) / 2;
+
+        AveragePrice = average;
+        AveragePriceLast5Seconds = average5Seconds;
+        AverageAmountQuantity = averageQuantity;
+    }
 }
